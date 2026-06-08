@@ -1,0 +1,205 @@
+/**
+ * Trends Page
+ * Historical tracking and projection of carbon footprint
+ */
+
+'use client';
+
+import * as React from 'react';
+import { Navbar } from '@/components/layout/navbar';
+import { Footer } from '@/components/layout/footer';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { CarbonTrendChart } from '@/components/charts/carbon-trend-chart';
+import { useStore, useCarbonProfile, useTrends } from '@/lib/hooks/use-store';
+import { formatCarbonValue } from '@/lib/utils/calculator';
+import { cn } from '@/lib/utils/helpers';
+
+export default function TrendsPage(): JSX.Element {
+  const carbonProfile = useCarbonProfile();
+  const trends = useTrends();
+  const { committedActions } = useStore();
+
+  if (!carbonProfile) {
+    return (
+      <>
+        <Navbar />
+        <main className="flex-1 flex items-center justify-center">
+          <Card className="max-w-md mx-auto">
+            <CardHeader>
+              <CardTitle>No Profile Found</CardTitle>
+              <CardDescription>Complete the onboarding to see your trends.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <a href="/onboarding">
+                <button className="w-full bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90">
+                  Start Onboarding
+                </button>
+              </a>
+            </CardContent>
+          </Card>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  // Calculate projections
+  const currentTotal = carbonProfile.totalAnnualKgCO2;
+  const committedSavings = committedActions.length * 200;
+  const projectedTotal = Math.max(0, currentTotal - committedSavings);
+  const reductionPercentage = currentTotal > 0 ? (committedSavings / currentTotal) * 100 : 0;
+
+  // Generate mock trend data if only one entry exists
+  const chartData = trends.length > 1
+    ? trends
+    : [
+        ...trends,
+        {
+          date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+          totalCarbon: currentTotal * 1.1,
+          categoryBreakdown: {
+            transport: carbonProfile.categoryBreakdown.transport.annualKgCO2 * 1.1,
+            diet: carbonProfile.categoryBreakdown.diet.annualKgCO2 * 1.1,
+            energy: carbonProfile.categoryBreakdown.energy.annualKgCO2 * 1.1,
+            digital: carbonProfile.categoryBreakdown.digital.annualKgCO2 * 1.1,
+            consumption: carbonProfile.categoryBreakdown.consumption.annualKgCO2 * 1.1,
+          },
+          score: Math.max(0, carbonProfile.overallScore - 10),
+        },
+      ].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  return (
+    <>
+      <Navbar />
+      <main className="flex-1 py-8">
+        <div className="container">
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold mb-2">Carbon Trends</h1>
+            <p className="text-muted-foreground">
+              Track your progress over time and see projections based on your committed actions.
+            </p>
+          </div>
+
+          {/* Projection Cards */}
+          <div className="grid sm:grid-cols-3 gap-4 mb-8">
+            <Card>
+              <CardContent className="pt-6">
+                <p className="text-sm text-muted-foreground">Current Annual</p>
+                <p className="text-2xl font-bold">{formatCarbonValue(currentTotal)} CO₂e</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <p className="text-sm text-muted-foreground">Projected (with actions)</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {formatCarbonValue(projectedTotal)} CO₂e
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <p className="text-sm text-muted-foreground">Potential Reduction</p>
+                <p className="text-2xl font-bold text-primary">
+                  {reductionPercentage.toFixed(1)}%
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Trend Chart */}
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>Emission Trend</CardTitle>
+              <CardDescription>Your carbon footprint over time</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <CarbonTrendChart
+                data={chartData}
+                target={projectedTotal}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Category Trends */}
+          <div className="grid md:grid-cols-2 gap-4 mb-8">
+            {Object.entries(carbonProfile.categoryBreakdown).map(([key, category]) => {
+              const trend = chartData.length > 1
+                ? ((chartData[chartData.length - 1].categoryBreakdown[key] - chartData[0].categoryBreakdown[key]) / chartData[0].categoryBreakdown[key]) * 100
+                : 0;
+
+              return (
+                <Card key={key}>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-semibold capitalize">{key}</h3>
+                      <Badge variant={trend < 0 ? 'success' : trend > 0 ? 'destructive' : 'secondary'}>
+                        {trend > 0 ? '+' : ''}{trend.toFixed(1)}%
+                      </Badge>
+                    </div>
+                    <p className="text-2xl font-bold">{formatCarbonValue(category.annualKgCO2)} CO₂e</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {category.dailyKgCO2.toFixed(1)} kg/day
+                    </p>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+
+          {/* Milestones */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Reduction Milestones</CardTitle>
+              <CardDescription>Targets based on your committed actions</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {[
+                  { target: currentTotal * 0.9, label: '10% Reduction', timeframe: '3 months' },
+                  { target: currentTotal * 0.8, label: '20% Reduction', timeframe: '6 months' },
+                  { target: currentTotal * 0.7, label: '30% Reduction', timeframe: '1 year' },
+                  { target: currentTotal * 0.5, label: '50% Reduction (Paris Aligned)', timeframe: '2 years' },
+                ].map((milestone, index) => {
+                  const progress = Math.max(0, Math.min(100, ((currentTotal - milestone.target) / currentTotal) * 100));
+                  const isReached = currentTotal <= milestone.target;
+
+                  return (
+                    <div key={index} className="flex items-center gap-4">
+                      <div className={cn(
+                        'w-10 h-10 rounded-full flex items-center justify-center text-lg',
+                        isReached ? 'bg-green-100' : 'bg-secondary'
+                      )}>
+                        {isReached ? '✅' : '🎯'}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium">{milestone.label}</span>
+                          <span className="text-sm text-muted-foreground">{milestone.timeframe}</span>
+                        </div>
+                        <div className="flex items-center gap-2 mt-1">
+                          <div className="flex-1 h-2 bg-secondary rounded-full overflow-hidden">
+                            <div
+                              className={cn('h-full rounded-full transition-all', isReached ? 'bg-green-500' : 'bg-primary')}
+                              style={{ width: `${progress}%` }}
+                            />
+                          </div>
+                          <span className="text-sm text-muted-foreground w-24 text-right">
+                            {formatCarbonValue(milestone.target)} CO₂e
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+      <Footer />
+    </>
+  );
+}

@@ -1,0 +1,21 @@
+{
+  "name": "EcoSync - Carbon Footprint Platform",
+  "short_name": "EcoSync",
+  "description": "Track and reduce your carbon footprint",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f0fdf4",
+  "theme_color": "#10b981",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "32x32",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/apple-icon.svg",
+      "sizes": "180x180",
+      "type": "image/svg+xml"
+    }
+  ]
+}
