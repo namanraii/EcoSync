@@ -80,7 +80,7 @@ describe('Carbon Calculator', () => {
     })
 
     it('should handle bicycle (zero emissions)', () => {
-      const data = { ...mockTransportData, primaryVehicle: 'bicycle' }
+      const data = { ...mockTransportData, primaryVehicle: 'bicycle' as const }
       const result = calculateTransportEmissions(data)
       expect(result.annualKgCO2).toBeGreaterThanOrEqual(0)
     })
@@ -216,6 +216,11 @@ describe('Carbon Calculator', () => {
 
     it('should format ton values', () => {
       expect(formatCarbonValue(1500)).toBe('1.5t')
+    })
+
+    it('should format negative values correctly', () => {
+      expect(formatCarbonValue(-500)).toBe('-500kg')
+      expect(formatCarbonValue(-1500)).toBe('-1.5t')
     })
   })
 })

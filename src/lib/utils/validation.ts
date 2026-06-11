@@ -1,10 +1,4 @@
-/**
- * Input Validation Utilities
- * Zod schemas for type-safe validation across the application
- */
-
 import { z } from 'zod'
-import { OnboardingData, UserInput } from '@/types'
 
 // ==================== ONBOARDING VALIDATION ====================
 
@@ -205,6 +199,15 @@ export function validateArrayLength<T>(
 }
 
 // Type exports for use in components
-export type ValidatedOnboardingData = z.infer<typeof OnboardingDataSchema>
-export type ValidatedUserInput = z.infer<typeof UserInputSchema>
-export type ValidatedUserProfile = z.infer<typeof UserProfileSchema>
+export type TransportData = z.infer<typeof TransportDataSchema>
+export type DietData = z.infer<typeof DietDataSchema>
+export type EnergyData = z.infer<typeof EnergyDataSchema>
+export type DigitalData = z.infer<typeof DigitalDataSchema>
+export type ConsumptionData = z.infer<typeof ConsumptionDataSchema>
+export type OnboardingData = z.infer<typeof OnboardingDataSchema>
+export type UserInput = z.infer<typeof UserInputSchema>
+export type UserProfile = z.infer<typeof UserProfileSchema>
+
+export type ValidatedOnboardingData = OnboardingData
+export type ValidatedUserInput = UserInput
+export type ValidatedUserProfile = UserProfile

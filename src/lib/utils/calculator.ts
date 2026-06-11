@@ -22,6 +22,40 @@ const DAYS_IN_YEAR = 365
 const WEEKS_IN_YEAR = 52
 const PERCENTAGE = 100
 const KG_PER_TONNE = 1000
+const MONTHS_IN_YEAR = 12
+
+/** Average number of working/commuting days in a year (5 days/week * 52 weeks = 260) */
+const WORKDAYS_IN_YEAR = 260
+
+/** Public transit distance factor ratio relative to weekly commuting distance */
+const PUBLIC_TRANSIT_DISTANCE_RATIO = 0.3
+
+/** Ratio of flights categorized as short-haul (flights < 1500km) */
+const SHORT_FLIGHT_RATIO = 0.7
+
+/** Ratio of flights categorized as long-haul (flights >= 1500km) */
+const LONG_FLIGHT_RATIO = 0.3
+
+/** Baseline electricity usage in kWh per square meter per year */
+const BASE_KWH_PER_SQM = 15
+
+/** Incremental home energy consumption factor per additional occupant */
+const ENERGY_OCCUPANT_INCREMENT_RATIO = 0.3
+
+/** Estimated percentage allocation of home energy to space heating */
+const HEATING_ENERGY_RATIO = 0.4
+
+/** Efficiency/conversion adjustment factor for space heating emissions */
+const HEATING_EMISSIONS_ADJUSTMENT = 0.5
+
+/** Estimated fraction of monthly shopping budget allocated to clothing */
+const CLOTHING_BUDGET_RATIO = 0.3
+
+/** Estimated fraction of monthly shopping budget allocated to electronics */
+const ELECTRONICS_BUDGET_RATIO = 0.2
+
+/** Estimated fraction of monthly shopping budget allocated to services */
+const SERVICES_BUDGET_RATIO = 0.5
 
 // ==================== COLOR PALETTE FOR BREAKDOWN ====================
 const CATEGORY_COLORS: Record<EmissionCategory, string[]> = {
@@ -54,14 +88,14 @@ export function calculateTransportEmissions(data: OnboardingData['transport']): 
   const transitFactor = getEmissionFactor('transport', 'public_bus', 'global')
   if (transitFactor) {
     const transitMultiplier: Record<string, number> = {
-      daily: 260,
+      daily: WORKDAYS_IN_YEAR,
       weekly: WEEKS_IN_YEAR,
-      rarely: 12,
+      rarely: MONTHS_IN_YEAR,
       never: 0,
     }
     transitEmissions =
       weeklyDistance *
-      0.3 *
+      PUBLIC_TRANSIT_DISTANCE_RATIO *
       transitFactor.factor *
       (transitMultiplier[data.publicTransitFrequency] ?? 0)
   }
@@ -71,8 +105,8 @@ export function calculateTransportEmissions(data: OnboardingData['transport']): 
   const shortFlightFactor = getEmissionFactor('transport', 'flight_short', 'global')
   const longFlightFactor = getEmissionFactor('transport', 'flight_long', 'global')
   if (shortFlightFactor && longFlightFactor) {
-    const shortFlights = Math.floor(data.flightsPerYear * 0.7)
-    const longFlights = Math.ceil(data.flightsPerYear * 0.3)
+    const shortFlights = Math.floor(data.flightsPerYear * SHORT_FLIGHT_RATIO)
+    const longFlights = Math.ceil(data.flightsPerYear * LONG_FLIGHT_RATIO)
     flightEmissions =
       shortFlights * shortFlightFactor.factor + longFlights * longFlightFactor.factor
   }
@@ -83,19 +117,19 @@ export function calculateTransportEmissions(data: OnboardingData['transport']): 
     {
       label: 'Primary Vehicle',
       value: primaryEmissions,
-      percentage: (primaryEmissions / totalAnnual) * PERCENTAGE,
+      percentage: totalAnnual > 0 ? (primaryEmissions / totalAnnual) * PERCENTAGE : 0,
       color: CATEGORY_COLORS.transport[0] ?? '#10b981',
     },
     {
       label: 'Public Transit',
       value: transitEmissions,
-      percentage: (transitEmissions / totalAnnual) * PERCENTAGE,
+      percentage: totalAnnual > 0 ? (transitEmissions / totalAnnual) * PERCENTAGE : 0,
       color: CATEGORY_COLORS.transport[1] ?? '#10b981',
     },
     {
       label: 'Air Travel',
       value: flightEmissions,
-      percentage: (flightEmissions / totalAnnual) * PERCENTAGE,
+      percentage: totalAnnual > 0 ? (flightEmissions / totalAnnual) * PERCENTAGE : 0,
       color: CATEGORY_COLORS.transport[2] ?? '#10b981',
     },
   ].filter((item) => item.value > 0)
@@ -145,19 +179,19 @@ export function calculateDietEmissions(data: OnboardingData['diet']): CarbonResu
     {
       label: 'Diet Base',
       value: baseEmissions,
-      percentage: (baseEmissions / totalAnnual) * PERCENTAGE,
+      percentage: totalAnnual > 0 ? (baseEmissions / totalAnnual) * PERCENTAGE : 0,
       color: CATEGORY_COLORS.diet[0] ?? '#10b981',
     },
     {
       label: 'Local Food Bonus',
       value: Math.abs(localBonus),
-      percentage: (Math.abs(localBonus) / totalAnnual) * PERCENTAGE,
+      percentage: totalAnnual > 0 ? (Math.abs(localBonus) / totalAnnual) * PERCENTAGE : 0,
       color: CATEGORY_COLORS.diet[1] ?? '#10b981',
     },
     {
       label: 'Food Waste',
       value: wastePenalty,
-      percentage: (wastePenalty / totalAnnual) * PERCENTAGE,
+      percentage: totalAnnual > 0 ? (wastePenalty / totalAnnual) * PERCENTAGE : 0,
       color: CATEGORY_COLORS.diet[2] ?? '#10b981',
     },
   ].filter((item) => item.value > 0.1)
@@ -177,8 +211,10 @@ export function calculateDietEmissions(data: OnboardingData['diet']): CarbonResu
  */
 export function calculateEnergyEmissions(data: OnboardingData['energy']): CarbonResult {
   // Estimate electricity usage based on home size and occupants
-  const baseKwhPerSqm = 15 // Average kWh per sqm per year
-  const estimatedKwh = data.squareMeters * baseKwhPerSqm * (1 + (data.occupants - 1) * 0.3)
+  const estimatedKwh =
+    data.squareMeters *
+    BASE_KWH_PER_SQM *
+    (1 + (data.occupants - 1) * ENERGY_OCCUPANT_INCREMENT_RATIO)
 
   // Get region-specific electricity factor (default to global)
   const electricityFactor = getEmissionFactor('energy', 'electricity_global', 'global')
@@ -200,8 +236,9 @@ export function calculateEnergyEmissions(data: OnboardingData['energy']): Carbon
 
   const heatingFactor = getEmissionFactor('energy', 'natural_gas', 'global')
   if (heatingFactor && data.heatingType !== 'solar') {
-    const heatingKwh = estimatedKwh * 0.4 * (heatingMultipliers[data.heatingType] ?? 1.0)
-    heatingEmissions = heatingKwh * heatingFactor.factor * 0.5
+    const heatingKwh =
+      estimatedKwh * HEATING_ENERGY_RATIO * (heatingMultipliers[data.heatingType] ?? 1.0)
+    heatingEmissions = heatingKwh * heatingFactor.factor * HEATING_EMISSIONS_ADJUSTMENT
   }
 
   // AC usage multiplier
@@ -226,25 +263,25 @@ export function calculateEnergyEmissions(data: OnboardingData['energy']): Carbon
     {
       label: 'Electricity',
       value: electricityEmissions,
-      percentage: (electricityEmissions / totalAnnual) * PERCENTAGE,
+      percentage: totalAnnual > 0 ? (electricityEmissions / totalAnnual) * PERCENTAGE : 0,
       color: CATEGORY_COLORS.energy[0] ?? '#10b981',
     },
     {
       label: 'Heating',
       value: heatingEmissions,
-      percentage: (heatingEmissions / totalAnnual) * PERCENTAGE,
+      percentage: totalAnnual > 0 ? (heatingEmissions / totalAnnual) * PERCENTAGE : 0,
       color: CATEGORY_COLORS.energy[1] ?? '#10b981',
     },
     {
       label: 'Air Conditioning',
       value: acEmissions,
-      percentage: (acEmissions / totalAnnual) * PERCENTAGE,
+      percentage: totalAnnual > 0 ? (acEmissions / totalAnnual) * PERCENTAGE : 0,
       color: CATEGORY_COLORS.energy[2] ?? '#10b981',
     },
     {
       label: 'Renewable Offset',
       value: Math.abs(renewableBonus),
-      percentage: (Math.abs(renewableBonus) / totalAnnual) * PERCENTAGE,
+      percentage: totalAnnual > 0 ? (Math.abs(renewableBonus) / totalAnnual) * PERCENTAGE : 0,
       color: CATEGORY_COLORS.energy[3] ?? '#10b981',
     },
   ].filter((item) => item.value > 0.1)
@@ -276,7 +313,7 @@ export function calculateDigitalEmissions(data: OnboardingData['digital']): Carb
   const screenEmissions = data.dailyScreenHours * DAYS_IN_YEAR * screenFactor.factor
   const streamingEmissions = data.streamingHours * DAYS_IN_YEAR * streamingFactor.factor
   const emailEmissions = data.emailCount * DAYS_IN_YEAR * emailFactor.factor
-  const cloudEmissions = data.cloudStorageGB * cloudFactor.factor * 12 // Monthly
+  const cloudEmissions = data.cloudStorageGB * cloudFactor.factor * MONTHS_IN_YEAR // Monthly
   const standbyEmissions = data.deviceCount * standbyFactor.factor * DAYS_IN_YEAR
 
   const totalAnnual =
@@ -286,31 +323,31 @@ export function calculateDigitalEmissions(data: OnboardingData['digital']): Carb
     {
       label: 'Screen Time',
       value: screenEmissions,
-      percentage: (screenEmissions / totalAnnual) * PERCENTAGE,
+      percentage: totalAnnual > 0 ? (screenEmissions / totalAnnual) * PERCENTAGE : 0,
       color: CATEGORY_COLORS.digital[0] ?? '#10b981',
     },
     {
       label: 'Streaming',
       value: streamingEmissions,
-      percentage: (streamingEmissions / totalAnnual) * PERCENTAGE,
+      percentage: totalAnnual > 0 ? (streamingEmissions / totalAnnual) * PERCENTAGE : 0,
       color: CATEGORY_COLORS.digital[1] ?? '#10b981',
     },
     {
       label: 'Email',
       value: emailEmissions,
-      percentage: (emailEmissions / totalAnnual) * PERCENTAGE,
+      percentage: totalAnnual > 0 ? (emailEmissions / totalAnnual) * PERCENTAGE : 0,
       color: CATEGORY_COLORS.digital[2] ?? '#10b981',
     },
     {
       label: 'Cloud Storage',
       value: cloudEmissions,
-      percentage: (cloudEmissions / totalAnnual) * PERCENTAGE,
+      percentage: totalAnnual > 0 ? (cloudEmissions / totalAnnual) * PERCENTAGE : 0,
       color: CATEGORY_COLORS.digital[3] ?? '#10b981',
     },
     {
       label: 'Device Standby',
       value: standbyEmissions,
-      percentage: (standbyEmissions / totalAnnual) * PERCENTAGE,
+      percentage: totalAnnual > 0 ? (standbyEmissions / totalAnnual) * PERCENTAGE : 0,
       color: CATEGORY_COLORS.digital[4] ?? '#10b981',
     },
   ].filter((item) => item.value > 0.1)
@@ -338,9 +375,9 @@ export function calculateConsumptionEmissions(data: OnboardingData['consumption'
   }
 
   // Estimate budget allocation
-  const clothingBudget = data.monthlyShoppingBudget * 0.3 * 12
-  const electronicsBudget = data.monthlyShoppingBudget * 0.2 * 12
-  const servicesBudget = data.monthlyShoppingBudget * 0.5 * 12
+  const clothingBudget = data.monthlyShoppingBudget * CLOTHING_BUDGET_RATIO * MONTHS_IN_YEAR
+  const electronicsBudget = data.monthlyShoppingBudget * ELECTRONICS_BUDGET_RATIO * MONTHS_IN_YEAR
+  const servicesBudget = data.monthlyShoppingBudget * SERVICES_BUDGET_RATIO * MONTHS_IN_YEAR
 
   const clothingEmissions = clothingBudget * clothingFactor.factor
   const electronicsEmissions = electronicsBudget * electronicsFactor.factor
@@ -366,25 +403,25 @@ export function calculateConsumptionEmissions(data: OnboardingData['consumption'
     {
       label: 'Clothing',
       value: clothingEmissions,
-      percentage: (clothingEmissions / totalAnnual) * PERCENTAGE,
+      percentage: totalAnnual > 0 ? (clothingEmissions / totalAnnual) * PERCENTAGE : 0,
       color: CATEGORY_COLORS.consumption[0] ?? '#10b981',
     },
     {
       label: 'Electronics',
       value: electronicsEmissions,
-      percentage: (electronicsEmissions / totalAnnual) * PERCENTAGE,
+      percentage: totalAnnual > 0 ? (electronicsEmissions / totalAnnual) * PERCENTAGE : 0,
       color: CATEGORY_COLORS.consumption[1] ?? '#10b981',
     },
     {
       label: 'Services',
       value: servicesEmissions,
-      percentage: (servicesEmissions / totalAnnual) * PERCENTAGE,
+      percentage: totalAnnual > 0 ? (servicesEmissions / totalAnnual) * PERCENTAGE : 0,
       color: CATEGORY_COLORS.consumption[2] ?? '#10b981',
     },
     {
       label: 'Recycling Offset',
       value: Math.abs(recyclingBonus),
-      percentage: (Math.abs(recyclingBonus) / totalAnnual) * PERCENTAGE,
+      percentage: totalAnnual > 0 ? (Math.abs(recyclingBonus) / totalAnnual) * PERCENTAGE : 0,
       color: CATEGORY_COLORS.consumption[3] ?? '#10b981',
     },
   ].filter((item) => item.value > 0.1)
@@ -423,7 +460,8 @@ export function buildCarbonProfile(data: OnboardingData, region: string = 'globa
 
   // Calculate percentile vs regional average
   const regionalAverage = REGIONAL_AVERAGES[region] ?? REGIONAL_AVERAGES['global'] ?? 12000
-  const percentile = Math.round((1 - totalAnnual / regionalAverage) * PERCENTAGE)
+  const percentile =
+    regionalAverage > 0 ? Math.round((1 - totalAnnual / regionalAverage) * PERCENTAGE) : 0
 
   return {
     totalAnnualKgCO2: Math.round(totalAnnual * 100) / 100,
@@ -457,7 +495,9 @@ export function calculateCarbonScore(annualKgCO2: number): number {
   }
 
   // Linear interpolation between excellent and poor
-  const score = PERCENTAGE - ((annualKgCO2 - excellent) / (poor - excellent)) * PERCENTAGE
+  const denominator = poor - excellent
+  const score =
+    denominator > 0 ? PERCENTAGE - ((annualKgCO2 - excellent) / denominator) * PERCENTAGE : 0
   return Math.round(score * 10) / 10
 }
 
@@ -508,7 +548,8 @@ export function getCarbonRating(score: number): {
  * Format carbon value for display
  */
 export function formatCarbonValue(kgCO2: number): string {
-  if (kgCO2 >= KG_PER_TONNE) {
+  const absVal = Math.abs(kgCO2)
+  if (absVal >= KG_PER_TONNE) {
     return `${(kgCO2 / KG_PER_TONNE).toFixed(1)}t`
   }
   return `${Math.round(kgCO2)}kg`

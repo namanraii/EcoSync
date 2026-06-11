@@ -52,13 +52,24 @@ Object.defineProperty(window, 'cancelIdleCallback', {
 })
 
 // Mock localStorage
+const localStorageStore: Record<string, string> = {}
 const localStorageMock = {
-  getItem: vi.fn(),
-  setItem: vi.fn(),
-  removeItem: vi.fn(),
-  clear: vi.fn(),
-  length: 0,
-  key: vi.fn(),
+  getItem: vi.fn((key: string): string | null => localStorageStore[key] ?? null),
+  setItem: vi.fn((key: string, value: string): void => {
+    localStorageStore[key] = value
+  }),
+  removeItem: vi.fn((key: string): void => {
+    delete localStorageStore[key]
+  }),
+  clear: vi.fn((): void => {
+    for (const key of Object.keys(localStorageStore)) {
+      delete localStorageStore[key]
+    }
+  }),
+  get length(): number {
+    return Object.keys(localStorageStore).length
+  },
+  key: vi.fn((index: number): string | null => Object.keys(localStorageStore)[index] ?? null),
 }
 
 Object.defineProperty(window, 'localStorage', {

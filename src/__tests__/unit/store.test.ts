@@ -292,7 +292,7 @@ describe('Zustand Store Integration', () => {
   })
 
   describe('Persistence', () => {
-    it.skip('should persist and rehydrate state', () => {
+    it('should persist and rehydrate state', () => {
       const profile: UserProfile = {
         id: 'persist-test',
         name: 'Persist User',

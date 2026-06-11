@@ -3,11 +3,19 @@
 import * as React from 'react'
 import { useRouter } from 'next/navigation'
 import { ChevronRight, ChevronLeft, Check, AlertCircle } from 'lucide-react'
+import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { useStore } from '@/lib/hooks/use-store'
-import { validateOnboardingData } from '@/lib/utils/validation'
+import {
+  validateOnboardingData,
+  TransportDataSchema,
+  DietDataSchema,
+  EnergyDataSchema,
+  DigitalDataSchema,
+  ConsumptionDataSchema,
+} from '@/lib/utils/validation'
 import type { OnboardingData } from '@/types'
 
 import { TransportStep } from './onboarding-steps/TransportStep'
@@ -120,6 +128,41 @@ export default function OnboardingWizard(): JSX.Element {
   }
 
   const handleNext = (): void => {
+    setErrors([])
+    let stepValidationResult: { success: boolean; error?: z.ZodError } | { success: true }
+
+    switch (currentStep) {
+      case 0:
+        stepValidationResult = TransportDataSchema.safeParse(formData.transport)
+        break
+      case 1:
+        stepValidationResult = DietDataSchema.safeParse(formData.diet)
+        break
+      case 2:
+        stepValidationResult = EnergyDataSchema.safeParse(formData.energy)
+        break
+      case 3:
+        stepValidationResult = DigitalDataSchema.safeParse(formData.digital)
+        break
+      case 4:
+        stepValidationResult = ConsumptionDataSchema.safeParse(formData.consumption)
+        break
+      default:
+        stepValidationResult = { success: true }
+    }
+
+    if (
+      !stepValidationResult.success &&
+      'error' in stepValidationResult &&
+      stepValidationResult.error
+    ) {
+      const stepErrors = stepValidationResult.error.errors.map(
+        (err) => `${err.path.join('.')}: ${err.message}`
+      )
+      setErrors(stepErrors)
+      return
+    }
+
     if (currentStep < STEPS.length - 1) {
       setCurrentStep((prev) => prev + 1)
       const nextStep = STEPS[currentStep + 1]

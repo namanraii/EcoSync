@@ -19,13 +19,7 @@ export interface EmissionFactor {
 
 export type EmissionCategory = 'transport' | 'diet' | 'energy' | 'digital' | 'consumption'
 
-export interface UserInput {
-  category: EmissionCategory
-  subcategory: string
-  value: number
-  frequency: 'daily' | 'weekly' | 'monthly' | 'yearly'
-  metadata?: Record<string, string | number>
-}
+export type { UserInput } from '@/lib/utils/validation'
 
 export interface CarbonResult {
   category: EmissionCategory
@@ -54,61 +48,15 @@ export interface CarbonProfile {
 
 // ==================== USER PROFILE TYPES ====================
 
-export interface UserProfile {
-  id: string
-  name: string
-  email?: string
-  region: string
-  householdSize: number
-  onboardingComplete: boolean
-  createdAt: string
-  updatedAt: string
-}
-
-export interface OnboardingData {
-  transport: TransportData
-  diet: DietData
-  energy: EnergyData
-  digital: DigitalData
-  consumption: ConsumptionData
-}
-
-export interface TransportData {
-  primaryVehicle: string
-  weeklyDistanceKm: number
-  publicTransitFrequency: 'daily' | 'weekly' | 'rarely' | 'never'
-  flightsPerYear: number
-}
-
-export interface DietData {
-  dietType: 'vegan' | 'vegetarian' | 'pescatarian' | 'flexitarian' | 'omnivore' | 'high-meat'
-  localFoodPercentage: number
-  foodWasteFrequency: 'never' | 'rarely' | 'sometimes' | 'often'
-}
-
-export interface EnergyData {
-  homeType: 'apartment' | 'house' | 'studio'
-  squareMeters: number
-  occupants: number
-  renewablePercentage: number
-  heatingType: 'electric' | 'gas' | 'oil' | 'heat-pump' | 'solar'
-  acUsage: 'never' | 'occasional' | 'regular' | 'constant'
-}
-
-export interface DigitalData {
-  dailyScreenHours: number
-  streamingHours: number
-  emailCount: number
-  cloudStorageGB: number
-  deviceCount: number
-}
-
-export interface ConsumptionData {
-  monthlyShoppingBudget: number
-  clothingFrequency: 'rarely' | 'occasionally' | 'monthly' | 'weekly'
-  electronicsFrequency: 'yearly' | 'bi-yearly' | 'rarely'
-  recyclingHabits: 'always' | 'often' | 'sometimes' | 'rarely'
-}
+export type {
+  UserProfile,
+  OnboardingData,
+  TransportData,
+  DietData,
+  EnergyData,
+  DigitalData,
+  ConsumptionData,
+} from '@/lib/utils/validation'
 
 // ==================== ACTION TYPES ====================
 

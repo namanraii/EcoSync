@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { useShallow } from 'zustand/react/shallow'
 import type {
   OnboardingData,
   UserProfile,
@@ -224,29 +225,29 @@ export const useStore = create<AppState>()(
 
 // Selectors
 export function useCarbonProfile(): CarbonProfile | null {
-  return useStore((state) => state.carbonProfile)
+  return useStore(useShallow((state) => state.carbonProfile))
 }
 
 export function useCommittedActions(): string[] {
-  return useStore((state) => state.committedActions)
+  return useStore(useShallow((state) => state.committedActions))
 }
 
 export function useActionProgress(): Record<string, number> {
-  return useStore((state) => state.actionProgress)
+  return useStore(useShallow((state) => state.actionProgress))
 }
 
 export function useInsights(): Insight[] {
-  return useStore((state) => state.insights)
+  return useStore(useShallow((state) => state.insights))
 }
 
 export function useTrends(): TrendData[] {
-  return useStore((state) => state.trends)
+  return useStore(useShallow((state) => state.trends))
 }
 
 export function useUserProfile(): UserProfile | null {
-  return useStore((state) => state.userProfile)
+  return useStore(useShallow((state) => state.userProfile))
 }
 
 export function useToast(): ToastData | null {
-  return useStore((state) => state.toast)
+  return useStore(useShallow((state) => state.toast))
 }

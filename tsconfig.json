@@ -37,5 +37,5 @@
     "noImplicitOverride": true
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "dist/types/**/*.ts"],
-  "exclude": ["node_modules", "ecosync-improvements"]
+  "exclude": ["node_modules"]
 }
