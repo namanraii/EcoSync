@@ -3,7 +3,7 @@
  * Entry point for the carbon footprint assessment
  */
 
-import { OnboardingWizard } from '@/components/forms/onboarding-wizard';
+import OnboardingWizard from '@/components/forms/onboarding-wizard';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 

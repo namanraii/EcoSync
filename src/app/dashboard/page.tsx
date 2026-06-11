@@ -1,240 +1,406 @@
-/**
- * Dashboard Page
- * Main user dashboard showing carbon profile overview
- */
+'use client'
 
-'use client';
+import * as React from 'react'
+import dynamic from 'next/dynamic'
+import { Suspense } from 'react'
+import { useRouter } from 'next/navigation'
+import { AlertTriangle, TrendingUp, Leaf, Zap, ShoppingBag, Monitor } from 'lucide-react'
 
-import * as React from 'react';
-import Link from 'next/link';
-import { Navbar } from '@/components/layout/navbar';
-import { Footer } from '@/components/layout/footer';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { CarbonScoreGauge } from '@/components/charts/carbon-score-gauge';
-import { CarbonDonutChart } from '@/components/charts/carbon-donut-chart';
-import { CategoryBarChart } from '@/components/charts/category-bar-chart';
-import { useStore, useCarbonProfile } from '@/lib/hooks/use-store';
-import { formatCarbonValue, getCarbonRating } from '@/lib/utils/calculator';
-import { getRecommendedActions } from '@/lib/data/carbon-actions';
-import { cn } from '@/lib/utils/helpers';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
+import { ScoreAnnouncement } from '@/components/accessibility/aria-live-region'
+import { ChartErrorBoundary } from '@/components/charts/chart-error-boundary'
+import { useStore, useCarbonProfile, useCommittedActions } from '@/lib/hooks/use-store'
+import { getCarbonRating, formatCarbonValue } from '@/lib/utils/calculator'
+import { CARBON_ACTIONS } from '@/lib/data/carbon-actions'
+import type { EmissionCategory } from '@/types'
+
+// Dynamic imports for heavy chart components (EFFICIENCY FIX)
+const CarbonDonutChart = dynamic(
+  () => import('@/components/charts/carbon-donut-chart').then((mod) => mod.CarbonDonutChart),
+  {
+    ssr: false,
+    loading: () => <ChartSkeleton height={300} label="Loading emission breakdown..." />,
+  }
+)
+
+const CarbonScoreGauge = dynamic(
+  () => import('@/components/charts/carbon-score-gauge').then((mod) => mod.CarbonScoreGauge),
+  {
+    ssr: false,
+    loading: () => <ChartSkeleton height={200} label="Loading score gauge..." />,
+  }
+)
+
+const CategoryBarChart = dynamic(
+  () => import('@/components/charts/category-bar-chart').then((mod) => mod.CategoryBarChart),
+  {
+    ssr: false,
+    loading: () => <ChartSkeleton height={300} label="Loading category comparison..." />,
+  }
+)
+
+const CarbonTrendChart = dynamic(
+  () => import('@/components/charts/carbon-trend-chart').then((mod) => mod.CarbonTrendChart),
+  {
+    ssr: false,
+    loading: () => <ChartSkeleton height={300} label="Loading trend chart..." />,
+  }
+)
+
+// Skeleton component for Suspense fallback
+function ChartSkeleton({ height, label }: { height: number; label: string }): JSX.Element {
+  return (
+    <Card role="status" aria-label={label}>
+      <CardContent className="p-6">
+        <div
+          className="animate-pulse rounded-md bg-muted"
+          style={{ height: `${height}px` }}
+        />
+        <p className="sr-only mt-2 text-sm text-muted-foreground">{label}</p>
+      </CardContent>
+    </Card>
+  )
+}
+
+const CATEGORY_ICONS: Record<EmissionCategory, React.ReactNode> = {
+  transport: <TrendingUp className="h-4 w-4" aria-hidden="true" />,
+  diet: <Leaf className="h-4 w-4" aria-hidden="true" />,
+  energy: <Zap className="h-4 w-4" aria-hidden="true" />,
+  digital: <Monitor className="h-4 w-4" aria-hidden="true" />,
+  consumption: <ShoppingBag className="h-4 w-4" aria-hidden="true" />,
+}
+
 
 export default function DashboardPage(): JSX.Element {
-  const carbonProfile = useCarbonProfile();
-  const { committedActions } = useStore();
+  const router = useRouter()
+  const carbonProfile = useCarbonProfile()
+  const committedActions = useCommittedActions()
+  const { trends } = useStore()
+  const [previousScore, setPreviousScore] = React.useState<number | undefined>(undefined)
 
-  // Redirect if no profile
+  // Track score changes for aria-live announcements
+  React.useEffect(() => {
+    if (carbonProfile) {
+      setPreviousScore((prev) => {
+        if (prev !== undefined && prev !== carbonProfile.overallScore) {
+          // Score changed - will be announced by ScoreAnnouncement
+        }
+        return carbonProfile.overallScore
+      })
+    }
+  }, [carbonProfile?.overallScore])
+
   if (!carbonProfile) {
     return (
-      <>
-        <Navbar />
-        <main className="flex-1 flex items-center justify-center">
-          <Card className="max-w-md mx-auto">
-            <CardHeader>
-              <CardTitle>No Profile Found</CardTitle>
-              <CardDescription>
-                Complete the onboarding to see your carbon dashboard.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Link href="/onboarding">
-                <Button className="w-full">Start Onboarding</Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </main>
-        <Footer />
-      </>
-    );
+      <main id="main-content" role="main" className="container mx-auto px-4 py-8">
+        <div className="flex flex-col items-center justify-center py-20">
+          <AlertTriangle className="mb-4 h-12 w-12 text-muted-foreground" aria-hidden="true" />
+          <h1 className="text-2xl font-bold">No Carbon Profile Found</h1>
+          <p className="mt-2 text-muted-foreground">
+            Complete the onboarding to see your carbon dashboard.
+          </p>
+          <Button
+            className="mt-6"
+            onClick={() => router.push('/onboarding')}
+            aria-label="Start carbon footprint assessment"
+          >
+            Start Assessment
+          </Button>
+        </div>
+      </main>
+    )
   }
 
-  const rating = getCarbonRating(carbonProfile.overallScore);
-  const categories = carbonProfile.categoryBreakdown;
+  const rating = getCarbonRating(carbonProfile.overallScore)
+  const categories = carbonProfile.categoryBreakdown
+  const committedActionObjects = CARBON_ACTIONS.filter((a) =>
+    committedActions.includes(a.id)
+  )
+  const totalSavings = committedActionObjects.reduce(
+    (sum, a) => sum + a.impactScore,
+    0
+  )
 
-  // Get recommendations based on highest emission categories
-  const categoryValues: Record<string, number> = {};
-  Object.entries(categories).forEach(([key, value]) => {
-    categoryValues[key] = value.annualKgCO2;
-  });
-  const recommendations = getRecommendedActions(categoryValues, 3);
-
-  // Calculate committed savings
-  const totalSavings = committedActions.length * 200; // Rough estimate
+  // Get top 3 recommendations based on highest emission categories
+  const sortedCategories = Object.entries(categories).sort(
+    (a, b) => b[1].annualKgCO2 - a[1].annualKgCO2
+  )
+  const topCategories = sortedCategories.slice(0, 2).map(([cat]) => cat as EmissionCategory)
+  const recommendations = CARBON_ACTIONS.filter(
+    (a) => topCategories.includes(a.category) && !committedActions.includes(a.id)
+  )
+    .sort((a, b) => b.impactScore - a.impactScore)
+    .slice(0, 3)
 
   return (
-    <>
-      <Navbar />
-      <main className="flex-1 py-8">
-        <div className="container">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Your Carbon Dashboard</h1>
-            <p className="text-muted-foreground">
-              Last updated: {new Date(carbonProfile.lastUpdated).toLocaleDateString()}
-            </p>
-          </div>
+    <main id="main-content" role="main" className="container mx-auto px-4 py-8">
+      {/* Aria-live region for score announcements */}
+      <ScoreAnnouncement
+        score={carbonProfile.overallScore}
+        {...(previousScore !== undefined ? { previousScore } : {})}
+      />
 
-          {/* Score Alert */}
-          <Alert
-            variant={carbonProfile.overallScore >= 60 ? 'success' : carbonProfile.overallScore >= 40 ? 'warning' : 'destructive'}
-            className="mb-6"
-          >
-            <AlertTitle>Your Carbon Score: {carbonProfile.overallScore}/100</AlertTitle>
-            <AlertDescription>
-              {rating.description} You emit {formatCarbonValue(carbonProfile.totalAnnualKgCO2)} CO₂e annually.
-              {carbonProfile.percentile && (
-                <> You are doing better than {carbonProfile.percentile}% of people in your region.</>
+      {/* Header */}
+      <header className="mb-8">
+        <h1 className="text-3xl font-bold tracking-tight">Your Carbon Dashboard</h1>
+        <p className="mt-1 text-muted-foreground">
+          Last updated: {new Date(carbonProfile.lastUpdated).toLocaleDateString()}
+        </p>
+      </header>
+
+      {/* Score Alert with aria-live */}
+      <section
+        role="region"
+        aria-label="Carbon score summary"
+        aria-live="polite"
+        aria-atomic="true"
+        className="mb-6"
+      >
+        <Card
+          className={
+            carbonProfile.overallScore >= 60
+              ? 'border-green-200 bg-green-50/50'
+              : carbonProfile.overallScore >= 40
+              ? 'border-yellow-200 bg-yellow-50/50'
+              : 'border-red-200 bg-red-50/50'
+          }
+        >
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              Your Carbon Score: {carbonProfile.overallScore}/100
+            </CardTitle>
+            <CardDescription>
+              <span className={rating.color}>{rating.label}</span>.{' '}
+              {rating.description} You emit{' '}
+              <strong>{formatCarbonValue(carbonProfile.totalAnnualKgCO2)}</strong> CO₂e
+              annually.
+              {carbonProfile.percentile !== undefined && (
+                <>
+                  {' '}
+                  You are doing better than{' '}
+                  <strong>{carbonProfile.percentile}%</strong> of people in your region.
+                </>
               )}
-            </AlertDescription>
-          </Alert>
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      </section>
 
-          {/* Main Stats Grid */}
-          <div className="grid lg:grid-cols-3 gap-6 mb-8">
-            {/* Score Gauge */}
-            <Card>
-              <CardContent className="pt-6">
-                <CarbonScoreGauge score={carbonProfile.overallScore} size="lg" />
-              </CardContent>
-            </Card>
-
-            {/* Quick Stats */}
-            <Card className="lg:col-span-2">
+      {/* Main Stats Grid */}
+      <div className="mb-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {/* Score Gauge */}
+        <Suspense fallback={<ChartSkeleton height={200} label="Loading score gauge..." />}>
+          <ChartErrorBoundary
+            fallbackTitle="Score Gauge"
+            ariaLabel="Carbon score visualization"
+          >
+            <Card role="region" aria-label="Carbon score gauge">
               <CardHeader>
-                <CardTitle>Quick Stats</CardTitle>
+                <CardTitle>Score</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">Annual Emissions</p>
-                    <p className="text-2xl font-bold">{formatCarbonValue(carbonProfile.totalAnnualKgCO2)} CO₂e</p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">Daily Average</p>
-                    <p className="text-2xl font-bold">{formatCarbonValue(carbonProfile.totalDailyKgCO2)} CO₂e</p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">Actions Committed</p>
-                    <p className="text-2xl font-bold">{committedActions.length}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">Potential Savings</p>
-                    <p className="text-2xl font-bold text-green-600">{formatCarbonValue(totalSavings)} CO₂e</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Charts Grid */}
-          <div className="grid lg:grid-cols-2 gap-6 mb-8">
-            {/* Breakdown Donut */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Emission Breakdown</CardTitle>
-                <CardDescription>By category</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <CarbonDonutChart
-                  data={Object.values(categories).flatMap((cat) => cat.breakdown)}
-                  total={carbonProfile.totalAnnualKgCO2}
+              <CardContent className="flex justify-center">
+                <CarbonScoreGauge
+                  score={carbonProfile.overallScore}
+                  size="md"
+                  showLabel={true}
                 />
               </CardContent>
             </Card>
+          </ChartErrorBoundary>
+        </Suspense>
 
-            {/* Category Comparison */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Category Comparison</CardTitle>
-                <CardDescription>Annual emissions by category</CardDescription>
+        {/* Quick Stats */}
+        <Card role="region" aria-label="Quick statistics">
+          <CardHeader>
+            <CardTitle>Quick Stats</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <p className="text-sm text-muted-foreground">Annual Emissions</p>
+              <p className="text-2xl font-bold">
+                {formatCarbonValue(carbonProfile.totalAnnualKgCO2)} CO₂e
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Daily Average</p>
+              <p className="text-2xl font-bold">
+                {formatCarbonValue(carbonProfile.totalDailyKgCO2)} CO₂e
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Actions Committed</p>
+              <p className="text-2xl font-bold">{committedActions.length}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Potential Savings</p>
+              <p className="text-2xl font-bold text-green-600">
+                {formatCarbonValue(totalSavings)} CO₂e
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Charts Grid */}
+      <div className="mb-8 grid gap-4 md:grid-cols-2">
+        {/* Breakdown Donut */}
+        <Suspense fallback={<ChartSkeleton height={300} label="Loading emission breakdown..." />}>
+          <ChartErrorBoundary
+            fallbackTitle="Emission Breakdown"
+            ariaLabel="Emission breakdown by category"
+          >
+            <CarbonDonutChart
+              data={Object.values(categories).flatMap((cat) => cat.breakdown)}
+              total={carbonProfile.totalAnnualKgCO2}
+              ariaLabel="Carbon emission breakdown by subcategory"
+              ariaDescription="Interactive donut chart showing your carbon emissions distributed across subcategories"
+            />
+          </ChartErrorBoundary>
+        </Suspense>
+
+        {/* Category Comparison */}
+        <Suspense fallback={<ChartSkeleton height={300} label="Loading category comparison..." />}>
+          <ChartErrorBoundary
+            fallbackTitle="Category Comparison"
+            ariaLabel="Category comparison chart"
+          >
+            <CategoryBarChart
+              data={Object.entries(categories).map(([key, cat]) => ({
+                name: key.charAt(0).toUpperCase() + key.slice(1),
+                value: cat.annualKgCO2,
+                color: cat.breakdown[0]?.color || '#10b981',
+              }))}
+              ariaLabel="Annual emissions by category"
+            />
+          </ChartErrorBoundary>
+        </Suspense>
+      </div>
+
+      {/* Category Details */}
+      <section
+        role="region"
+        aria-label="Category details"
+        className="mb-8"
+      >
+        <h2 className="mb-4 text-xl font-semibold">Category Breakdown</h2>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {Object.entries(categories).map(([key, category]) => {
+            return (
+              <Card
+                key={key}
+                role="article"
+                aria-label={`${key} category details`}
+                className="transition-all hover:shadow-md"
+              >
+                <CardHeader className="pb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-md p-1.5" aria-hidden="true">
+                      {CATEGORY_ICONS[key as EmissionCategory]}
+                    </span>
+                    <CardTitle className="text-lg capitalize">{key}</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Badge
+                    variant={
+                      category.annualKgCO2 > 2000
+                        ? 'destructive'
+                        : category.annualKgCO2 > 1000
+                        ? 'warning'
+                        : 'success'
+                    }
+                    className="mb-2"
+                  >
+                    {formatCarbonValue(category.annualKgCO2)}/yr
+                  </Badge>
+                  <p className="text-sm text-muted-foreground">
+                    {category.dailyKgCO2.toFixed(1)} kg CO₂e/day
+                  </p>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Confidence: {Math.round(category.confidence * 100)}%
+                  </p>
+                  <Progress
+                    value={Math.min((category.annualKgCO2 / 5000) * 100, 100)}
+                    className="mt-3"
+                    aria-label={`${key} emission progress bar`}
+                    aria-valuenow={Math.round(category.annualKgCO2)}
+                    aria-valuemax={5000}
+                  />
+                </CardContent>
+              </Card>
+            )
+          })}
+        </div>
+      </section>
+
+      {/* Trend Chart */}
+      {trends.length > 1 && (
+        <Suspense fallback={<ChartSkeleton height={300} label="Loading trend chart..." />}>
+          <ChartErrorBoundary
+            fallbackTitle="Trend Analysis"
+            ariaLabel="Carbon trend over time"
+          >
+            <CarbonTrendChart
+              data={trends}
+              ariaLabel="Carbon emission trends over time"
+            />
+          </ChartErrorBoundary>
+        </Suspense>
+      )}
+
+      {/* Recommended Actions */}
+      <section
+        role="region"
+        aria-label="Recommended actions"
+        className="mb-8"
+      >
+        <h2 className="mb-4 text-xl font-semibold">Recommended Actions</h2>
+        <p className="mb-4 text-sm text-muted-foreground">
+          Based on your highest impact areas: {topCategories.map((c) => c.charAt(0).toUpperCase() + c.slice(1)).join(', ')}
+        </p>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {recommendations.map((action) => (
+            <Card
+              key={action.id}
+              role="article"
+              aria-label={`Action: ${action.title}`}
+              className="transition-all hover:shadow-md"
+            >
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base">{action.title}</CardTitle>
+                  <Badge variant="outline">{action.difficulty}</Badge>
+                </div>
               </CardHeader>
               <CardContent>
-                <CategoryBarChart categories={categories} />
+                <p className="text-sm text-muted-foreground">{action.description}</p>
+                <div className="mt-3 flex items-center gap-2 text-sm">
+                  <Leaf className="h-4 w-4 text-green-500" aria-hidden="true" />
+                  <span>
+                    Save {formatCarbonValue(action.impactScore)} CO₂e/year
+                  </span>
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {action.estimatedCost} cost • {action.timeToImplement}
+                </p>
+                <Button
+                  className="mt-4 w-full"
+                  variant="outline"
+                  onClick={() => {
+                    useStore.getState().commitAction(action.id)
+                  }}
+                  aria-label={`Commit to action: ${action.title}`}
+                >
+                  Commit to Action
+                </Button>
               </CardContent>
             </Card>
-          </div>
-
-          {/* Category Details */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-            {Object.entries(categories).map(([key, category]) => {
-              const catRating = getCarbonRating(
-                100 - (category.annualKgCO2 / 5000) * 100
-              );
-              return (
-                <Card key={key} className="hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg capitalize">{key}</CardTitle>
-                      <Badge variant={category.annualKgCO2 > 2000 ? 'destructive' : category.annualKgCO2 > 1000 ? 'warning' : 'success'}>
-                        {formatCarbonValue(category.annualKgCO2)}/yr
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <Progress
-                      value={Math.min(100, (category.annualKgCO2 / 5000) * 100)}
-                      size="sm"
-                      showValue={false}
-                      color={catRating.color.replace('text-', 'bg-')}
-                    />
-                    <p className="text-sm text-muted-foreground mt-2">
-                      {category.dailyKgCO2.toFixed(1)} kg CO₂e/day
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Confidence: {Math.round(category.confidence * 100)}%
-                    </p>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-
-          {/* Recommended Actions */}
-          <Card className="mb-8">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Recommended Actions</CardTitle>
-                  <CardDescription>Based on your highest impact areas</CardDescription>
-                </div>
-                <Link href="/actions">
-                  <Button variant="outline">View All Actions</Button>
-                </Link>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {recommendations.map((action) => (
-                  <div
-                    key={action.id}
-                    className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent/50 transition-colors"
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <h4 className="font-medium">{action.title}</h4>
-                        <Badge variant={action.difficulty === 'easy' ? 'success' : action.difficulty === 'medium' ? 'warning' : 'destructive'}>
-                          {action.difficulty}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Save {formatCarbonValue(action.impactScore)} CO₂e/year • {action.estimatedCost} cost
-                      </p>
-                    </div>
-                    <Link href="/actions">
-                      <Button size="sm" variant="ghost">
-                        View
-                      </Button>
-                    </Link>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          ))}
         </div>
-      </main>
-      <Footer />
-    </>
-  );
+      </section>
+    </main>
+  )
 }

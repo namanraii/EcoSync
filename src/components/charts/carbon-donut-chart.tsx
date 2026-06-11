@@ -1,109 +1,178 @@
-/**
- * Carbon Donut Chart
- * Interactive breakdown visualization with accessibility support
- */
+'use client'
 
-'use client';
-
-import * as React from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { BreakdownItem } from '@/types';
-import { formatCarbonValue } from '@/lib/utils/calculator';
-import { cn } from '@/lib/utils/helpers';
+import * as React from 'react'
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+  Sector,
+} from 'recharts'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import type { BreakdownItem } from '@/types'
 
 interface CarbonDonutChartProps {
-  data: BreakdownItem[];
-  total: number;
-  className?: string;
+  data: BreakdownItem[]
+  total: number
+  ariaLabel?: string
+  ariaDescription?: string
 }
 
-interface CustomTooltipProps {
-  active?: boolean;
-  payload?: Array<{
-    name: string;
-    value: number;
-    payload: BreakdownItem;
-  }>;
-}
-
-function CustomTooltip({ active, payload }: CustomTooltipProps): JSX.Element | null {
-  if (!active || !payload || !payload.length) return null;
-
-  const item = payload[0].payload;
-  return (
-    <div className="rounded-lg border bg-white p-3 shadow-lg">
-      <p className="font-semibold text-sm">{item.label}</p>
-      <p className="text-sm text-muted-foreground">
-        {formatCarbonValue(item.value)} CO₂e/year
-      </p>
-      <p className="text-sm font-medium text-primary">{item.percentage.toFixed(1)}%</p>
-    </div>
-  );
-}
-
-export function CarbonDonutChart({ data, total, className }: CarbonDonutChartProps): JSX.Element {
-  const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
-
-  // Filter out negligible values
-  const filteredData = data.filter((item) => item.percentage > 1);
-
-  const handleMouseEnter = (_: unknown, index: number): void => {
-    setActiveIndex(index);
-  };
-
-  const handleMouseLeave = (): void => {
-    setActiveIndex(null);
-  };
+// Memoized active shape for performance
+const renderActiveShape = (props: any): JSX.Element => {
+  const {
+    cx, cy, innerRadius, outerRadius, startAngle, endAngle,
+    fill, payload, percent
+  } = props
 
   return (
-    <div className={cn('relative', className)}>
-      <ResponsiveContainer width="100%" height={300}>
-        <PieChart>
-          <Pie
-            data={filteredData}
-            cx="50%"
-            cy="50%"
-            innerRadius={60}
-            outerRadius={100}
-            paddingAngle={2}
-            dataKey="value"
-            nameKey="label"
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            animationBegin={0}
-            animationDuration={800}
-            tabIndex={0}
-            aria-label="Carbon footprint breakdown by category"
-          >
-            {filteredData.map((entry, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={entry.color}
-                stroke={activeIndex === index ? '#000' : 'transparent'}
-                strokeWidth={activeIndex === index ? 2 : 0}
-                opacity={activeIndex === null || activeIndex === index ? 1 : 0.6}
-              />
+    <g>
+      <text x={cx} y={cy - 10} dy={8} textAnchor="middle" fill={fill} className="text-lg font-bold">
+        {payload.label}
+      </text>
+      <text x={cx} y={cy + 15} dy={8} textAnchor="middle" fill="#666" className="text-sm">
+        {`${(percent * 100).toFixed(1)}%`}
+      </text>
+      <Sector
+        cx={cx}
+        cy={cy}
+        innerRadius={innerRadius}
+        outerRadius={outerRadius + 8}
+        startAngle={startAngle}
+        endAngle={endAngle}
+        fill={fill}
+      />
+      <Sector
+        cx={cx}
+        cy={cy}
+        startAngle={startAngle}
+        endAngle={endAngle}
+        innerRadius={outerRadius + 12}
+        outerRadius={outerRadius + 16}
+        fill={fill}
+      />
+    </g>
+  )
+}
+
+// Memoized chart component to prevent re-renders on parent state changes
+export const CarbonDonutChart = React.memo(function CarbonDonutChart({
+  data,
+  total,
+  ariaLabel = 'Carbon emission breakdown by category',
+  ariaDescription = 'Donut chart showing the distribution of carbon emissions across different categories'
+}: CarbonDonutChartProps): JSX.Element {
+  const [activeIndex, setActiveIndex] = React.useState(0)
+  const chartId = React.useId()
+
+  const onPieEnter = React.useCallback(
+    (_: any, index: number) => {
+      setActiveIndex(index)
+    },
+    []
+  )
+
+  // Filter out zero values and sort by percentage descending
+  const chartData = React.useMemo(() => {
+    return data
+      .filter((item) => item.value > 0)
+      .sort((a, b) => b.percentage - a.percentage)
+      .map((item) => ({
+        name: item.label,
+        value: Math.round(item.value * 100) / 100,
+        color: item.color,
+        percentage: item.percentage,
+      }))
+  }, [data])
+
+  if (chartData.length === 0) {
+    return (
+      <Card role="region" aria-label={ariaLabel}>
+        <CardHeader>
+          <CardTitle>Emission Breakdown</CardTitle>
+          <CardDescription>No emission data available</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground">Complete the onboarding to see your breakdown.</p>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  return (
+    <Card
+      role="region"
+      aria-label={ariaLabel}
+      aria-describedby={`${chartId}-desc`}
+    >
+      <CardHeader>
+        <CardTitle>Emission Breakdown</CardTitle>
+        <CardDescription id={`${chartId}-desc`}>
+          {ariaDescription}. Total: {total.toFixed(1)} kg CO₂e/year
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {/* Visually hidden table for screen readers */}
+        <table className="sr-only">
+          <caption>Carbon emission breakdown data</caption>
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Emissions (kg CO₂e/year)</th>
+              <th>Percentage</th>
+            </tr>
+          </thead>
+          <tbody>
+            {chartData.map((item) => (
+              <tr key={item.name}>
+                <td>{item.name}</td>
+                <td>{item.value}</td>
+                <td>{item.percentage.toFixed(1)}%</td>
+              </tr>
             ))}
-          </Pie>
-          <Tooltip content={<CustomTooltip />} />
-          <Legend
-            verticalAlign="bottom"
-            height={36}
-            iconType="circle"
-            formatter={(value: string, entry: { payload?: BreakdownItem }) => {
-              const percentage = entry?.payload?.percentage ?? 0;
-              return `${value} (${percentage.toFixed(1)}%)`;
-            }}
-          />
-        </PieChart>
-      </ResponsiveContainer>
-      {/* Center text */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-        <span className="text-2xl font-bold text-foreground">
-          {formatCarbonValue(total)}
-        </span>
-        <span className="text-xs text-muted-foreground">CO₂e/year</span>
-      </div>
-    </div>
-  );
-}
+          </tbody>
+        </table>
+
+        <div className="h-[300px] w-full" aria-hidden="true">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                activeIndex={activeIndex}
+                activeShape={renderActiveShape}
+                data={chartData}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={100}
+                dataKey="value"
+                onMouseEnter={onPieEnter}
+                animationBegin={0}
+                animationDuration={800}
+                isAnimationActive={true}
+              >
+                {chartData.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={entry.color}
+                    stroke="none"
+                  />
+                ))}
+              </Pie>
+              <Tooltip
+                formatter={(value: number) => [`${value.toFixed(1)} kg CO₂e`, 'Emissions']}
+                contentStyle={{
+                  borderRadius: '8px',
+                  border: 'none',
+                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </CardContent>
+    </Card>
+  )
+})
+
+CarbonDonutChart.displayName = 'CarbonDonutChart'

@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { useStore, useCarbonProfile } from '@/lib/hooks/use-store';
-import { formatCarbonValue, getCarbonRating } from '@/lib/utils/calculator';
+import { formatCarbonValue } from '@/lib/utils/calculator';
 import { REGIONAL_AVERAGES } from '@/lib/data/emission-factors';
 import { cn } from '@/lib/utils/helpers';
 
@@ -81,7 +81,7 @@ export default function InsightsPage(): JSX.Element {
     }
 
     // Comparison insight
-    const globalAverage = REGIONAL_AVERAGES.global;
+    const globalAverage = REGIONAL_AVERAGES['global'] ?? 12000;
     const diff = carbonProfile.totalAnnualKgCO2 - globalAverage;
     if (diff > 0) {
       items.push({
@@ -136,7 +136,6 @@ export default function InsightsPage(): JSX.Element {
     }
 
     // Score-based insight
-    const rating = getCarbonRating(carbonProfile.overallScore);
     if (carbonProfile.overallScore >= 70) {
       items.push({
         id: 'good-score',

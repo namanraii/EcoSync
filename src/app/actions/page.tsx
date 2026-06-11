@@ -12,8 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { useStore, useCarbonProfile } from '@/lib/hooks/use-store';
+import { useStore } from '@/lib/hooks/use-store';
 import { CARBON_ACTIONS, getActionsByCategory } from '@/lib/data/carbon-actions';
 import { formatCarbonValue } from '@/lib/utils/calculator';
 import { cn } from '@/lib/utils/helpers';
@@ -27,7 +26,6 @@ const CATEGORY_ICONS: Record<string, string> = {
 };
 
 export default function ActionsPage(): JSX.Element {
-  const carbonProfile = useCarbonProfile();
   const { committedActions, actionProgress, commitAction, uncommitAction, updateActionProgress } = useStore();
   const [activeCategory, setActiveCategory] = React.useState<string>('all');
   const [selectedAction, setSelectedAction] = React.useState<string | null>(null);

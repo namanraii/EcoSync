@@ -7,7 +7,6 @@ import { describe, it, expect } from 'vitest';
 import {
   validateOnboardingData,
   validateUserInput,
-  validateUserProfile,
   sanitizeString,
   validateRange,
 } from '@/lib/utils/validation';
@@ -137,7 +136,11 @@ describe('Validation', () => {
 
   describe('String Sanitization', () => {
     it('should remove HTML tags', () => {
-      expect(sanitizeString('<script>alert("xss")</script>')).toBe('alert("xss")');
+      expect(sanitizeString('<p>hello world</p>')).toBe('hello world');
+    });
+
+    it('should remove script tags completely', () => {
+      expect(sanitizeString('<script>alert("xss")</script>')).toBe('');
     });
 
     it('should remove javascript protocol', () => {

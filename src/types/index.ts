@@ -195,6 +195,12 @@ export interface ToastNotification {
   duration: number;
 }
 
+// Simplified toast for store state
+export interface ToastData {
+  message: string;
+  type: 'success' | 'error' | 'warning' | 'info';
+}
+
 // ==================== API TYPES ====================
 
 export interface ApiResponse<T> {

@@ -10,7 +10,6 @@ import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { CarbonTrendChart } from '@/components/charts/carbon-trend-chart';
 import { useStore, useCarbonProfile, useTrends } from '@/lib/hooks/use-store';
 import { formatCarbonValue } from '@/lib/utils/calculator';
@@ -118,7 +117,7 @@ export default function TrendsPage(): JSX.Element {
             <CardContent>
               <CarbonTrendChart
                 data={chartData}
-                target={projectedTotal}
+                ariaLabel="Carbon emission trend over time"
               />
             </CardContent>
           </Card>
@@ -126,8 +125,12 @@ export default function TrendsPage(): JSX.Element {
           {/* Category Trends */}
           <div className="grid md:grid-cols-2 gap-4 mb-8">
             {Object.entries(carbonProfile.categoryBreakdown).map(([key, category]) => {
-              const trend = chartData.length > 1
-                ? ((chartData[chartData.length - 1].categoryBreakdown[key] - chartData[0].categoryBreakdown[key]) / chartData[0].categoryBreakdown[key]) * 100
+              const lastEntry = chartData[chartData.length - 1]
+              const firstEntry = chartData[0]
+              const lastVal = lastEntry?.categoryBreakdown[key as keyof typeof lastEntry.categoryBreakdown] ?? 0
+              const firstVal = firstEntry?.categoryBreakdown[key as keyof typeof firstEntry.categoryBreakdown] ?? 0
+              const trend = chartData.length > 1 && firstVal !== 0
+                ? ((lastVal - firstVal) / firstVal) * 100
                 : 0;
 
               return (

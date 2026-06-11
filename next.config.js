@@ -7,6 +7,10 @@ const nextConfig = {
   },
   trailingSlash: true,
   poweredByHeader: false,
+  // Security: Disable x-powered-by header
+  generateEtags: true,
+  // Compression for static export
+  compress: true,
   headers: async () => [
     {
       source: '/(.*)',
@@ -29,15 +33,31 @@ const nextConfig = {
         },
         {
           key: 'Content-Security-Policy',
-          value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';",
+          value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;",
         },
         {
           key: 'Permissions-Policy',
-          value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
+          value: 'camera=(), microphone=(), geolocation=(), interest-cohort=(), accelerometer=(), gyroscope=(), magnetometer=(), payment=(), usb=()',
+        },
+        {
+          key: 'Strict-Transport-Security',
+          value: 'max-age=63072000; includeSubDomains; preload',
+        },
+        {
+          key: 'Cross-Origin-Opener-Policy',
+          value: 'same-origin',
+        },
+        {
+          key: 'Cross-Origin-Resource-Policy',
+          value: 'same-origin',
+        },
+        {
+          key: 'Cache-Control',
+          value: 'public, max-age=3600, stale-while-revalidate=86400',
         },
       ],
     },
   ],
-};
+}
 
-module.exports = nextConfig;
+module.exports = nextConfig

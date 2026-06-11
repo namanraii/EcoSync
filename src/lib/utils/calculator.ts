@@ -10,10 +10,8 @@ import {
   BreakdownItem,
   EmissionCategory,
   OnboardingData,
-  UserInput,
 } from '@/types';
 import {
-  EMISSION_FACTORS,
   getEmissionFactor,
   REGIONAL_AVERAGES,
   CARBON_SCORE_TARGETS,
@@ -55,7 +53,7 @@ export function calculateTransportEmissions(data: OnboardingData['transport']): 
       rarely: 12,
       never: 0,
     };
-    transitEmissions = weeklyDistance * 0.3 * transitFactor.factor * transitMultiplier[data.publicTransitFrequency];
+    transitEmissions = weeklyDistance * 0.3 * transitFactor.factor * (transitMultiplier[data.publicTransitFrequency] ?? 0);
   }
 
   // Flight calculation
@@ -75,19 +73,19 @@ export function calculateTransportEmissions(data: OnboardingData['transport']): 
       label: 'Primary Vehicle',
       value: primaryEmissions,
       percentage: (primaryEmissions / totalAnnual) * 100,
-      color: CATEGORY_COLORS.transport[0],
+      color: CATEGORY_COLORS.transport[0] ?? '#10b981',
     },
     {
       label: 'Public Transit',
       value: transitEmissions,
       percentage: (transitEmissions / totalAnnual) * 100,
-      color: CATEGORY_COLORS.transport[1],
+      color: CATEGORY_COLORS.transport[1] ?? '#10b981',
     },
     {
       label: 'Air Travel',
       value: flightEmissions,
       percentage: (flightEmissions / totalAnnual) * 100,
-      color: CATEGORY_COLORS.transport[2],
+      color: CATEGORY_COLORS.transport[2] ?? '#10b981',
     },
   ].filter((item) => item.value > 0);
 
@@ -127,7 +125,7 @@ export function calculateDietEmissions(data: OnboardingData['diet']): CarbonResu
     often: 1.0,
   };
   const wastePenalty = wastePenaltyFactor
-    ? wastePenaltyFactor.factor * 365 * wasteMultiplier[data.foodWasteFrequency]
+    ? wastePenaltyFactor.factor * 365 * (wasteMultiplier[data.foodWasteFrequency] ?? 0)
     : 0;
 
   const totalAnnual = baseEmissions + localBonus + wastePenalty;
@@ -137,19 +135,19 @@ export function calculateDietEmissions(data: OnboardingData['diet']): CarbonResu
       label: 'Diet Base',
       value: baseEmissions,
       percentage: (baseEmissions / totalAnnual) * 100,
-      color: CATEGORY_COLORS.diet[0],
+      color: CATEGORY_COLORS.diet[0] ?? '#10b981',
     },
     {
       label: 'Local Food Bonus',
       value: Math.abs(localBonus),
       percentage: (Math.abs(localBonus) / totalAnnual) * 100,
-      color: CATEGORY_COLORS.diet[1],
+      color: CATEGORY_COLORS.diet[1] ?? '#10b981',
     },
     {
       label: 'Food Waste',
       value: wastePenalty,
       percentage: (wastePenalty / totalAnnual) * 100,
-      color: CATEGORY_COLORS.diet[2],
+      color: CATEGORY_COLORS.diet[2] ?? '#10b981',
     },
   ].filter((item) => item.value > 0.1);
 
@@ -191,7 +189,7 @@ export function calculateEnergyEmissions(data: OnboardingData['energy']): Carbon
 
   const heatingFactor = getEmissionFactor('energy', 'natural_gas', 'global');
   if (heatingFactor && data.heatingType !== 'solar') {
-    const heatingKwh = estimatedKwh * 0.4 * heatingMultipliers[data.heatingType];
+    const heatingKwh = estimatedKwh * 0.4 * (heatingMultipliers[data.heatingType] ?? 1.0);
     heatingEmissions = heatingKwh * heatingFactor.factor * 0.5;
   }
 
@@ -202,7 +200,7 @@ export function calculateEnergyEmissions(data: OnboardingData['energy']): Carbon
     regular: 0.35,
     constant: 0.6,
   };
-  const acEmissions = estimatedKwh * acMultipliers[data.acUsage] * electricityFactor.factor;
+  const acEmissions = estimatedKwh * (acMultipliers[data.acUsage] ?? 0) * electricityFactor.factor;
 
   // Renewable energy bonus
   const renewableBonusFactor = getEmissionFactor('energy', 'renewable_bonus', 'global');
@@ -217,25 +215,25 @@ export function calculateEnergyEmissions(data: OnboardingData['energy']): Carbon
       label: 'Electricity',
       value: electricityEmissions,
       percentage: (electricityEmissions / totalAnnual) * 100,
-      color: CATEGORY_COLORS.energy[0],
+      color: CATEGORY_COLORS.energy[0] ?? '#10b981',
     },
     {
       label: 'Heating',
       value: heatingEmissions,
       percentage: (heatingEmissions / totalAnnual) * 100,
-      color: CATEGORY_COLORS.energy[1],
+      color: CATEGORY_COLORS.energy[1] ?? '#10b981',
     },
     {
       label: 'Air Conditioning',
       value: acEmissions,
       percentage: (acEmissions / totalAnnual) * 100,
-      color: CATEGORY_COLORS.energy[2],
+      color: CATEGORY_COLORS.energy[2] ?? '#10b981',
     },
     {
       label: 'Renewable Offset',
       value: Math.abs(renewableBonus),
       percentage: (Math.abs(renewableBonus) / totalAnnual) * 100,
-      color: CATEGORY_COLORS.energy[3],
+      color: CATEGORY_COLORS.energy[3] ?? '#10b981',
     },
   ].filter((item) => item.value > 0.1);
 
@@ -276,31 +274,31 @@ export function calculateDigitalEmissions(data: OnboardingData['digital']): Carb
       label: 'Screen Time',
       value: screenEmissions,
       percentage: (screenEmissions / totalAnnual) * 100,
-      color: CATEGORY_COLORS.digital[0],
+      color: CATEGORY_COLORS.digital[0] ?? '#10b981',
     },
     {
       label: 'Streaming',
       value: streamingEmissions,
       percentage: (streamingEmissions / totalAnnual) * 100,
-      color: CATEGORY_COLORS.digital[1],
+      color: CATEGORY_COLORS.digital[1] ?? '#10b981',
     },
     {
       label: 'Email',
       value: emailEmissions,
       percentage: (emailEmissions / totalAnnual) * 100,
-      color: CATEGORY_COLORS.digital[2],
+      color: CATEGORY_COLORS.digital[2] ?? '#10b981',
     },
     {
       label: 'Cloud Storage',
       value: cloudEmissions,
       percentage: (cloudEmissions / totalAnnual) * 100,
-      color: CATEGORY_COLORS.digital[3],
+      color: CATEGORY_COLORS.digital[3] ?? '#10b981',
     },
     {
       label: 'Device Standby',
       value: standbyEmissions,
       percentage: (standbyEmissions / totalAnnual) * 100,
-      color: CATEGORY_COLORS.digital[4],
+      color: CATEGORY_COLORS.digital[4] ?? '#10b981',
     },
   ].filter((item) => item.value > 0.1);
 
@@ -345,7 +343,7 @@ export function calculateConsumptionEmissions(data: OnboardingData['consumption'
   };
   const totalConsumption = clothingEmissions + electronicsEmissions + servicesEmissions;
   const recyclingBonus = recyclingBonusFactor
-    ? totalConsumption * (recyclingBonusFactor.factor * recyclingMultiplier[data.recyclingHabits])
+    ? totalConsumption * (recyclingBonusFactor.factor * (recyclingMultiplier[data.recyclingHabits] ?? 0))
     : 0;
 
   const totalAnnual = totalConsumption + recyclingBonus;
@@ -355,25 +353,25 @@ export function calculateConsumptionEmissions(data: OnboardingData['consumption'
       label: 'Clothing',
       value: clothingEmissions,
       percentage: (clothingEmissions / totalAnnual) * 100,
-      color: CATEGORY_COLORS.consumption[0],
+      color: CATEGORY_COLORS.consumption[0] ?? '#10b981',
     },
     {
       label: 'Electronics',
       value: electronicsEmissions,
       percentage: (electronicsEmissions / totalAnnual) * 100,
-      color: CATEGORY_COLORS.consumption[1],
+      color: CATEGORY_COLORS.consumption[1] ?? '#10b981',
     },
     {
       label: 'Services',
       value: servicesEmissions,
       percentage: (servicesEmissions / totalAnnual) * 100,
-      color: CATEGORY_COLORS.consumption[2],
+      color: CATEGORY_COLORS.consumption[2] ?? '#10b981',
     },
     {
       label: 'Recycling Offset',
       value: Math.abs(recyclingBonus),
       percentage: (Math.abs(recyclingBonus) / totalAnnual) * 100,
-      color: CATEGORY_COLORS.consumption[3],
+      color: CATEGORY_COLORS.consumption[3] ?? '#10b981',
     },
   ].filter((item) => item.value > 0.1);
 
@@ -413,7 +411,7 @@ export function buildCarbonProfile(
   const score = calculateCarbonScore(totalAnnual);
 
   // Calculate percentile vs regional average
-  const regionalAverage = REGIONAL_AVERAGES[region] || REGIONAL_AVERAGES.global;
+  const regionalAverage = REGIONAL_AVERAGES[region] ?? REGIONAL_AVERAGES['global'] ?? 12000;
   const percentile = Math.round((1 - totalAnnual / regionalAverage) * 100);
 
   return {

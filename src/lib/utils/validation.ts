@@ -122,7 +122,9 @@ export function validateUserInput(data: unknown): {
   const result = UserInputSchema.safeParse(data);
 
   if (result.success) {
-    return { success: true, data: result.data };
+    const { metadata, ...rest } = result.data
+    const userInput: UserInput = metadata !== undefined ? { ...rest, metadata } : rest
+    return { success: true, data: userInput };
   }
 
   return {
@@ -155,12 +157,15 @@ export function validateUserProfile(data: unknown): {
 
 /**
  * Sanitize and validate a string input
+ * Strips HTML tags, script content, and XSS vectors
  */
 export function sanitizeString(input: string, maxLength: number = 500): string {
   return input
-    .replace(/[<>]/g, '')
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/<[^>]+>/g, '')
     .replace(/javascript:/gi, '')
-    .replace(/on\w+=/gi, '')
+    .replace(/on\w+\s*=/gi, '')
+    .replace(/[<>'"&]/g, '')
     .trim()
     .slice(0, maxLength);
 }

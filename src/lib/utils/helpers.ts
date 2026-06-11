@@ -243,7 +243,7 @@ export function chunk<T>(array: T[], size: number): T[][] {
 export function getInitials(name: string): string {
   return name
     .split(' ')
-    .map((n) => n[0])
+    .map((n) => n[0] ?? '')
     .join('')
     .toUpperCase()
     .slice(0, 2);
@@ -253,7 +253,7 @@ export function getInitials(name: string): string {
  * Generate a random color from a palette
  */
 export function getRandomColor(palette: string[] = ['#10b981', '#3b82f6', '#f59e0b', '#ec4899']): string {
-  return palette[Math.floor(Math.random() * palette.length)];
+  return palette[Math.floor(Math.random() * palette.length)] ?? '#10b981';
 }
 
 /**

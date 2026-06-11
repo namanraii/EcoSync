@@ -111,12 +111,15 @@ Visualization (Recharts) → Insights Generation → Action Recommendations
 - 🎯 **Carbon Score**: 0-100 rating system with percentile rankings
 
 ### Technical Features
-- ♿ **WCAG 2.1 AA Accessible**: Keyboard navigation, screen reader support, ARIA labels
-- 🔒 **Security Hardened**: CSP headers, XSS prevention, input sanitization, rate limiting
-- 🧪 **Comprehensive Testing**: 85%+ unit test coverage, E2E with Playwright
+- ♿ **WCAG 2.1 AA Accessible**: Keyboard navigation, screen reader support, skip links, ARIA live regions, focus traps
+- 🔒 **Security Hardened**: CSP + HSTS + COOP + CORP headers, XSS prevention, input sanitization, rate limiting (10 ops/sec), 500KB item / 5MB storage caps
+- 🧪 **Comprehensive Testing**: 85%+ unit coverage (axe-core a11y, store integration, edge-cases, performance benchmarks), full E2E suite
 - 📱 **Fully Responsive**: Mobile-first design with breakpoints for all devices
-- ⚡ **Performance Optimized**: Lighthouse 95+ target, code splitting, lazy loading
-- 🌙 **Dark Mode Ready**: CSS variables support for theme switching
+- ⚡ **Performance Optimized**: Lighthouse 95+ target, `dynamic()` imports, React.memo, useMemo/useCallback, will-change hints
+- 🌙 **Dark Mode Ready**: `darkMode: ['class']`, CSS variables, system preference detection
+- 📋 **PWA Ready**: Web App Manifest, Service Worker, offline caching
+- 🖨️ **Print Stylesheet**: Optimized `@media print` layout for reports
+- 🔄 **Reduced Motion**: `prefers-reduced-motion` and `prefers-reduced-data` respected
 
 ---
 
@@ -198,24 +201,42 @@ npm run format:check
 │   │   ├── actions/           # Reduction actions library
 │   │   ├── insights/          # Personalized insights
 │   │   ├── trends/            # Historical tracking
-│   │   ├── layout.tsx         # Root layout with metadata
-│   │   ├── loading.tsx        # Loading state
-│   │   ├── error.tsx          # Error boundary
+│   │   ├── layout.tsx         # Root layout with skip link, PWA meta
+│   │   ├── loading.tsx        # Skeleton loading state with a11y
+│   │   ├── error.tsx          # Error boundary with aria-live
 │   │   └── not-found.tsx      # 404 page
 │   ├── components/
-│   │   ├── ui/               # Primitive components
-│   │   ├── charts/           # Data visualizations
+│   │   ├── ui/               # Primitive components (Button, Card, Input)
+│   │   ├── charts/           # Data visualizations (React.memo + aria)
+│   │   │   └── chart-error-boundary.tsx  # Error boundary for charts
+│   │   ├── accessibility/    # Accessibility primitives
+│   │   │   ├── skip-link.tsx
+│   │   │   ├── aria-live-region.tsx
+│   │   │   └── focus-trap.tsx
 │   │   ├── forms/            # Form components
 │   │   └── layout/           # Layout components
 │   ├── lib/
 │   │   ├── data/             # Emission factors & actions
-│   │   ├── utils/            # Calculator, validation
-│   │   └── hooks/            # Custom hooks
+│   │   ├── utils/            # Calculator, validation, helpers
+│   │   └── hooks/            # Custom hooks (use-store, use-local-storage with rate limiting)
 │   ├── types/                # TypeScript definitions
 │   └── __tests__/            # Test suites
+│       ├── setup.ts           # Mocks: matchMedia, IntersectionObserver, rIC
+│       ├── unit/
+│       │   ├── calculator.test.ts
+│       │   ├── validation.test.ts
+│       │   ├── store.test.ts         # Zustand integration tests
+│       │   ├── accessibility.test.tsx # axe-core audits
+│       │   ├── edge-cases.test.ts    # Edge case tests
+│       │   └── performance.test.ts   # Benchmark tests
+│       └── e2e/
+│           └── full-flow.spec.ts     # Complete user journey E2E
 ├── docs/                     # Architecture decisions
-├── public/                   # Static assets
-├── .github/workflows/        # CI/CD pipelines
+├── public/
+│   ├── manifest.json         # PWA manifest
+│   └── sw.js                 # Service worker (offline caching)
+├── .github/workflows/
+│   └── ci.yml                # 6-job CI pipeline
 └── README.md
 ```
 
@@ -259,11 +280,17 @@ npm run format:check
 ## Security
 
 ### Implemented Measures
-- **Content Security Policy**: Strict CSP headers in Next.js config
-- **XSS Prevention**: DOMPurify for user content, input sanitization
+- **Content Security Policy**: Strict CSP + `upgrade-insecure-requests` in Next.js config
+- **HSTS**: `max-age=63072000; includeSubDomains; preload` — protects against downgrade attacks
+- **COOP/CORP**: `Cross-Origin-Opener-Policy: same-origin` + `Cross-Origin-Resource-Policy: same-origin`
+- **Permissions Policy**: Restricts camera, mic, geolocation, accelerometer, payment, USB
+- **XSS Prevention**: DOMPurify for user content, script-stripping regex in `sanitizeString`
 - **CSRF Protection**: Built-in Next.js handling
-- **Rate Limiting**: API route protection
-- **Secure Headers**: X-Frame-Options, X-Content-Type-Options, Referrer-Policy
+- **Rate Limiting**: localStorage ops capped at 10/sec; 500KB/item; 5MB total
+- **Key Sanitization**: localStorage keys stripped of `< > ' " &`, limited to 256 chars
+- **Input Security**: `maxLength`, `autocomplete`, `pattern` attributes on all form inputs
+- **Secure Headers**: X-Frame-Options DENY, X-Content-Type-Options nosniff, Referrer-Policy
+- **Long-term Caching**: Static assets `max-age=31536000, immutable`
 - **Dependency Audit**: Automated `npm audit` in CI pipeline
 - **No Secrets**: Environment variables via `.env.example` only
 

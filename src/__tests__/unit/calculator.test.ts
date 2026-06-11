@@ -154,8 +154,8 @@ describe('Carbon Calculator', () => {
     });
 
     it('should apply recycling bonus', () => {
-      const alwaysRecycle = { ...mockConsumptionData, recyclingHabits: 'always' };
-      const neverRecycle = { ...mockConsumptionData, recyclingHabits: 'rarely' };
+      const alwaysRecycle = { ...mockConsumptionData, recyclingHabits: 'always' as const };
+      const neverRecycle = { ...mockConsumptionData, recyclingHabits: 'rarely' as const };
       const alwaysResult = calculateConsumptionEmissions(alwaysRecycle);
       const neverResult = calculateConsumptionEmissions(neverRecycle);
       expect(alwaysResult.annualKgCO2).toBeLessThan(neverResult.annualKgCO2);
