@@ -4,6 +4,7 @@ import './globals.css'
 import { Navbar } from '@/components/layout/navbar'
 import { Footer } from '@/components/layout/footer'
 import { SkipLink } from '@/components/accessibility/skip-link'
+import { HydrationGuard } from '@/components/layout/hydration-guard'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -80,7 +81,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }):
         <SkipLink />
 
         <Navbar />
-        {children}
+        <HydrationGuard>{children}</HydrationGuard>
         <Footer />
       </body>
     </html>

@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils/helpers'
 import { useStore, useUserProfile } from '@/lib/hooks/use-store'
+import { useHydrated } from '@/lib/hooks/use-hydrated'
 
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: '📊' },
@@ -24,6 +25,8 @@ export function Navbar(): JSX.Element {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false)
   const userProfile = useUserProfile()
   const { resetStore } = useStore()
+  const hydrated = useHydrated()
+  const showNav = hydrated && userProfile?.onboardingComplete
 
   const handleReset = (): void => {
     if (
@@ -64,7 +67,7 @@ export function Navbar(): JSX.Element {
 
         {/* Desktop Navigation */}
         <div className="hidden items-center gap-1 md:flex">
-          {userProfile?.onboardingComplete &&
+          {showNav &&
             NAV_ITEMS.map((item) => (
               <Link
                 key={item.href}
@@ -87,7 +90,7 @@ export function Navbar(): JSX.Element {
 
         {/* Right side actions */}
         <div className="flex items-center gap-2">
-          {userProfile?.onboardingComplete && (
+          {showNav && (
             <button
               onClick={handleReset}
               className="hidden items-center rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive sm:inline-flex"
@@ -137,7 +140,7 @@ export function Navbar(): JSX.Element {
       {mobileMenuOpen && (
         <div id="mobile-menu" className="border-t bg-background md:hidden" role="menu">
           <div className="container space-y-1 py-3">
-            {userProfile?.onboardingComplete ? (
+            {showNav ? (
               NAV_ITEMS.map((item) => (
                 <Link
                   key={item.href}
