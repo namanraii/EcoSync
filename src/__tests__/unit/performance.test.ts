@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { describe, it, expect } from 'vitest'
 import {
   calculateTransportEmissions,
@@ -210,8 +211,15 @@ describe('Performance Benchmarks', () => {
   })
 
   describe('Memory Efficiency', () => {
+    interface PerformanceWithMemory extends Performance {
+      memory?: {
+        usedJSHeapSize: number
+      }
+    }
+
     it('should not leak memory during repeated calculations', () => {
-      const initialMemory = (performance as any).memory?.usedJSHeapSize || 0
+      const initialMemory =
+        (performance as unknown as PerformanceWithMemory).memory?.usedJSHeapSize || 0
 
       for (let i = 0; i < 10000; i++) {
         buildCarbonProfile({
@@ -255,7 +263,8 @@ describe('Performance Benchmarks', () => {
         global.gc()
       }
 
-      const finalMemory = (performance as any).memory?.usedJSHeapSize || 0
+      const finalMemory =
+        (performance as unknown as PerformanceWithMemory).memory?.usedJSHeapSize || 0
 
       // Memory should not grow unboundedly
       if (initialMemory > 0 && finalMemory > 0) {

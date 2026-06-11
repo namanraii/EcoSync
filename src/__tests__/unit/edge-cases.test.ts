@@ -11,6 +11,7 @@ import {
   formatCarbonValue,
 } from '@/lib/utils/calculator'
 import { validateOnboardingData, validateUserInput, sanitizeString } from '@/lib/utils/validation'
+import { OnboardingData } from '@/types'
 
 describe('Calculator Edge Cases', () => {
   describe('Empty and Zero Data', () => {
@@ -35,7 +36,7 @@ describe('Calculator Edge Cases', () => {
         deviceCount: 1,
       })
       expect(result.annualKgCO2).toBeGreaterThan(0) // device standby still counts
-      expect(result.breakdown.some(b => b.label === 'Screen Time')).toBe(false)
+      expect(result.breakdown.some((b) => b.label === 'Screen Time')).toBe(false)
     })
 
     it('should handle zero shopping budget', () => {
@@ -82,7 +83,7 @@ describe('Calculator Edge Cases', () => {
         flightsPerYear: 100,
       })
       expect(result.annualKgCO2).toBeGreaterThan(0)
-      expect(result.breakdown.some(b => b.label === 'Air Travel')).toBe(true)
+      expect(result.breakdown.some((b) => b.label === 'Air Travel')).toBe(true)
     })
 
     it('should handle 24 hours of screen time', () => {
@@ -102,7 +103,8 @@ describe('Calculator Edge Cases', () => {
     it('should handle invalid vehicle type gracefully', () => {
       expect(() =>
         calculateTransportEmissions({
-          primaryVehicle: 'invalid_vehicle' as any,
+          primaryVehicle:
+            'invalid_vehicle' as unknown as OnboardingData['transport']['primaryVehicle'],
           weeklyDistanceKm: 100,
           publicTransitFrequency: 'weekly',
           flightsPerYear: 2,
@@ -113,7 +115,7 @@ describe('Calculator Edge Cases', () => {
     it('should handle invalid diet type gracefully', () => {
       expect(() =>
         calculateDietEmissions({
-          dietType: 'invalid_diet' as any,
+          dietType: 'invalid_diet' as unknown as OnboardingData['diet']['dietType'],
           localFoodPercentage: 20,
           foodWasteFrequency: 'sometimes',
         })
@@ -127,7 +129,7 @@ describe('Calculator Edge Cases', () => {
           squareMeters: 80,
           occupants: 2,
           renewablePercentage: 10,
-          heatingType: 'invalid_heating' as any,
+          heatingType: 'invalid_heating' as unknown as OnboardingData['energy']['heatingType'],
           acUsage: 'occasional',
         })
       ).not.toThrow()

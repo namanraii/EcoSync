@@ -21,7 +21,11 @@ export default function ErrorBoundary({ error, reset }: ErrorProps): JSX.Element
   }, [error])
 
   return (
-    <main id="main-content" role="main" className="container mx-auto flex min-h-[60vh] items-center justify-center px-4 py-8">
+    <main
+      id="main-content"
+      role="main"
+      className="container mx-auto flex min-h-[60vh] items-center justify-center px-4 py-8"
+    >
       <div className="w-full max-w-lg">
         {/* Aria-live region for error announcement */}
         <div aria-live="assertive" aria-atomic="true" className="sr-only">
@@ -44,9 +48,7 @@ export default function ErrorBoundary({ error, reset }: ErrorProps): JSX.Element
                 Error: {error.message || 'Unknown error'}
               </p>
               {error.digest && (
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Error ID: {error.digest}
-                </p>
+                <p className="mt-1 text-xs text-muted-foreground">Error ID: {error.digest}</p>
               )}
             </div>
 

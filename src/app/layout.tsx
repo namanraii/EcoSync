@@ -34,8 +34,7 @@ export const metadata: Metadata = {
     url: 'https://ecosync.vercel.app',
     siteName: 'EcoSync',
     title: 'EcoSync | Carbon Footprint Intelligence Platform',
-    description:
-      'Track, understand, and reduce your carbon footprint with personalized insights.',
+    description: 'Track, understand, and reduce your carbon footprint with personalized insights.',
     images: [
       {
         url: '/og-image.svg',
@@ -48,8 +47,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'EcoSync | Carbon Footprint Intelligence Platform',
-    description:
-      'Track, understand, and reduce your carbon footprint with personalized insights.',
+    description: 'Track, understand, and reduce your carbon footprint with personalized insights.',
     images: ['/og-image.svg'],
   },
   manifest: '/manifest.json',
@@ -75,11 +73,7 @@ export const viewport: Viewport = {
   colorScheme: 'light dark',
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}): JSX.Element {
+export default function RootLayout({ children }: { children: React.ReactNode }): JSX.Element {
   return (
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased`}>

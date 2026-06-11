@@ -23,6 +23,7 @@ We address the challenge of making carbon footprint awareness accessible, action
 ## Approach and Logic
 
 ### Problem Analysis
+
 Most carbon calculators are either too simplistic (giving a single number without context) or too complex (requiring expert knowledge). EcoSync strikes the balance by:
 
 1. **Intelligent Profiling**: 5-dimensional assessment covering Transport, Diet, Energy, Digital, and Consumption
@@ -33,17 +34,20 @@ Most carbon calculators are either too simplistic (giving a single number withou
 ### Algorithm Design
 
 **Carbon Calculation Engine** (`src/lib/utils/calculator.ts`):
+
 - Pure functions with deterministic outputs
 - Category-specific calculations with confidence scores
 - Regional adjustment factors (India, EU, US, Global)
 - Bonus/penalty system for behaviors (local food, recycling, renewables)
 
 **Scoring System**:
-- Score = 100 - (actual_emissions / target_range * 100)
+
+- Score = 100 - (actual_emissions / target_range \* 100)
 - Targets aligned with Paris Agreement (2t CO₂e = 100 points)
 - Percentile ranking against regional averages
 
 **Recommendation Engine**:
+
 - Sorts actions by impact score descending
 - Filters by user's highest emission categories
 - Considers difficulty and cost for personalization
@@ -53,6 +57,7 @@ Most carbon calculators are either too simplistic (giving a single number withou
 ## How the Solution Works
 
 ### Architecture
+
 ```
 ecosync/
 ├── src/
@@ -71,6 +76,7 @@ ecosync/
 ```
 
 ### User Flow
+
 1. **Landing Page** → Value proposition with animated score gauge
 2. **Onboarding** (5 steps, ~3 minutes) → Multi-step wizard with sliders and selects
 3. **Dashboard** → Real-time carbon profile with breakdown charts
@@ -79,6 +85,7 @@ ecosync/
 6. **Trends** → Historical tracking with milestone projections
 
 ### Data Flow
+
 ```
 User Input → Validation (Zod) → Calculation Engine → Carbon Profile →
 Visualization (Recharts) → Insights Generation → Action Recommendations
@@ -105,6 +112,7 @@ Visualization (Recharts) → Insights Generation → Action Recommendations
 ## Features
 
 ### Core Features
+
 - 🌍 **5-Dimensional Carbon Calculator**: Transport, Diet, Energy, Digital, Consumption
 - 📊 **Real-time Visualizations**: Donut charts, trend lines, category bars, score gauges
 - 💡 **Personalized Insights**: AI-generated warnings, opportunities, and achievements
@@ -113,6 +121,7 @@ Visualization (Recharts) → Insights Generation → Action Recommendations
 - 🎯 **Carbon Score**: 0-100 rating system with percentile rankings
 
 ### Technical Features
+
 - ♿ **WCAG 2.1 AA Accessible**: Keyboard navigation, screen reader support, skip links, ARIA live regions, focus traps
 - 🔒 **Security Hardened**: CSP + HSTS + COOP + CORP headers, XSS prevention, input sanitization, rate limiting (10 ops/sec), 500KB item / 5MB storage caps
 - 🧪 **Comprehensive Testing**: 85%+ unit coverage (axe-core a11y, store integration, edge-cases, performance benchmarks), full E2E suite
@@ -127,23 +136,24 @@ Visualization (Recharts) → Insights Generation → Action Recommendations
 
 ## Tech Stack
 
-| Layer | Technology | Purpose |
-|-------|-----------|---------|
-| Framework | Next.js 14 (App Router) | React framework with SSG |
-| Language | TypeScript 5.4 | Type safety, strict mode |
-| Styling | Tailwind CSS 3.4 | Utility-first CSS |
-| Components | shadcn/ui pattern | Accessible primitives |
-| State | Zustand 4.5 | Lightweight global store |
-| Charts | Recharts 2.12 | Responsive visualizations |
-| Validation | Zod 3.23 | Schema validation |
-| Testing | Vitest + Playwright | Unit + E2E testing |
-| CI/CD | GitHub Actions | Automated testing pipeline |
+| Layer      | Technology              | Purpose                    |
+| ---------- | ----------------------- | -------------------------- |
+| Framework  | Next.js 14 (App Router) | React framework with SSG   |
+| Language   | TypeScript 5.4          | Type safety, strict mode   |
+| Styling    | Tailwind CSS 3.4        | Utility-first CSS          |
+| Components | shadcn/ui pattern       | Accessible primitives      |
+| State      | Zustand 4.5             | Lightweight global store   |
+| Charts     | Recharts 2.12           | Responsive visualizations  |
+| Validation | Zod 3.23                | Schema validation          |
+| Testing    | Vitest + Playwright     | Unit + E2E testing         |
+| CI/CD      | GitHub Actions          | Automated testing pipeline |
 
 ---
 
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js 18.17.0 or higher
 - npm 9 or higher
 
@@ -247,18 +257,21 @@ npm run format:check
 ## Testing
 
 ### Unit Tests
+
 - **Coverage Target**: 85%+ lines, functions, statements
 - **Calculator Tests**: All 5 category calculations with edge cases
 - **Validation Tests**: Zod schema validation, input sanitization
 - **Utility Tests**: Helper functions, formatters
 
 ### E2E Tests
+
 - **Onboarding Flow**: Complete wizard navigation
 - **Dashboard**: Profile display after onboarding
 - **Accessibility**: ARIA labels, keyboard navigation, heading structure
 - **Responsive**: Mobile, tablet, desktop breakpoints
 
 ### Accessibility Tests
+
 - WCAG 2.1 AA compliance via axe-core
 - Keyboard-only navigation flow
 - Screen reader compatibility
@@ -269,6 +282,7 @@ npm run format:check
 ## Accessibility
 
 ### WCAG 2.1 AA Compliance
+
 - **Semantic HTML**: Proper heading hierarchy, landmarks, lists
 - **Keyboard Navigation**: Full tab order, Enter/Space activation, Escape to close
 - **ARIA Labels**: All interactive elements have descriptive labels
@@ -282,6 +296,7 @@ npm run format:check
 ## Security
 
 ### Implemented Measures
+
 - **Content Security Policy**: Strict CSP + `upgrade-insecure-requests` in Next.js config
 - **HSTS**: `max-age=63072000; includeSubDomains; preload` — protects against downgrade attacks
 - **COOP/CORP**: `Cross-Origin-Opener-Policy: same-origin` + `Cross-Origin-Resource-Policy: same-origin`
@@ -301,6 +316,7 @@ npm run format:check
 ## Deployment
 
 ### Vercel (Recommended)
+
 ```bash
 # Install Vercel CLI
 npm i -g vercel
@@ -310,7 +326,9 @@ vercel --prod
 ```
 
 ### Static Hosting
+
 The project builds to static HTML in `/dist`:
+
 ```bash
 npm run build
 # Upload /dist to any static host (Netlify, GitHub Pages, AWS S3)
@@ -321,6 +339,7 @@ npm run build
 ## Performance
 
 ### Targets
+
 - **Lighthouse Score**: 95+ across all categories
 - **Core Web Vitals**:
   - LCP < 2.5s
@@ -328,6 +347,7 @@ npm run build
   - CLS < 0.1
 
 ### Optimizations
+
 - Server Components for reduced client JS
 - Code splitting with dynamic imports
 - SVG-only graphics (no external images)

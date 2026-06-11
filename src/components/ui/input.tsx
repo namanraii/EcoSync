@@ -1,8 +1,7 @@
 import * as React from 'react'
 import { cn } from '@/lib/utils/helpers'
 
-export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   errorMessage?: string
   helperText?: string
   label?: string
@@ -34,21 +33,15 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const helperId = `${inputId}-helper`
     const hasError = !!errorMessage
 
-    const describedBy = [
-      helperText ? helperId : null,
-      hasError ? errorId : null,
-      ariaDescribedBy,
-    ]
-      .filter(Boolean)
-      .join(' ') || undefined
+    const describedBy =
+      [helperText ? helperId : null, hasError ? errorId : null, ariaDescribedBy]
+        .filter(Boolean)
+        .join(' ') || undefined
 
     return (
       <div className="w-full">
         {label && (
-          <label
-            htmlFor={inputId}
-            className="mb-1.5 block text-sm font-medium text-foreground"
-          >
+          <label htmlFor={inputId} className="mb-1.5 block text-sm font-medium text-foreground">
             {label}
             {props.required && (
               <span className="ml-1 text-destructive" aria-hidden="true">
@@ -80,11 +73,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           </p>
         )}
         {hasError && (
-          <p
-            id={errorId}
-            className="mt-1 text-xs text-destructive"
-            role="alert"
-          >
+          <p id={errorId} className="mt-1 text-xs text-destructive" role="alert">
             {errorMessage}
           </p>
         )}

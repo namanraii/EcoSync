@@ -3,17 +3,17 @@
  * Browse and commit to carbon reduction actions
  */
 
-'use client';
+'use client'
 
-import * as React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { useStore } from '@/lib/hooks/use-store';
-import { CARBON_ACTIONS, getActionsByCategory } from '@/lib/data/carbon-actions';
-import { formatCarbonValue } from '@/lib/utils/calculator';
-import { cn } from '@/lib/utils/helpers';
+import * as React from 'react'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
+import { useStore } from '@/lib/hooks/use-store'
+import { CARBON_ACTIONS, getActionsByCategory } from '@/lib/data/carbon-actions'
+import { formatCarbonValue } from '@/lib/utils/calculator'
+import { cn } from '@/lib/utils/helpers'
 
 const CATEGORY_ICONS: Record<string, string> = {
   transport: '🚗',
@@ -21,26 +21,26 @@ const CATEGORY_ICONS: Record<string, string> = {
   energy: '⚡',
   digital: '💻',
   consumption: '🛍️',
-};
+}
 
 export default function ActionsPage(): JSX.Element {
-  const { committedActions, actionProgress, commitAction, uncommitAction, updateActionProgress } = useStore();
-  const [activeCategory, setActiveCategory] = React.useState<string>('all');
-  const [selectedAction, setSelectedAction] = React.useState<string | null>(null);
+  const { committedActions, actionProgress, commitAction, uncommitAction, updateActionProgress } =
+    useStore()
+  const [activeCategory, setActiveCategory] = React.useState<string>('all')
+  const [selectedAction, setSelectedAction] = React.useState<string | null>(null)
 
-  const categories = ['all', 'transport', 'diet', 'energy', 'digital', 'consumption'];
+  const categories = ['all', 'transport', 'diet', 'energy', 'digital', 'consumption']
 
-  const filteredActions = activeCategory === 'all'
-    ? CARBON_ACTIONS
-    : getActionsByCategory(activeCategory);
+  const filteredActions =
+    activeCategory === 'all' ? CARBON_ACTIONS : getActionsByCategory(activeCategory)
 
-  const totalPotentialSavings = CARBON_ACTIONS
-    .filter((a) => !committedActions.includes(a.id))
-    .reduce((sum, a) => sum + a.impactScore, 0);
+  const totalPotentialSavings = CARBON_ACTIONS.filter(
+    (a) => !committedActions.includes(a.id)
+  ).reduce((sum, a) => sum + a.impactScore, 0)
 
-  const totalCommittedSavings = CARBON_ACTIONS
-    .filter((a) => committedActions.includes(a.id))
-    .reduce((sum, a) => sum + a.impactScore, 0);
+  const totalCommittedSavings = CARBON_ACTIONS.filter((a) =>
+    committedActions.includes(a.id)
+  ).reduce((sum, a) => sum + a.impactScore, 0)
 
   return (
     <>
@@ -48,7 +48,7 @@ export default function ActionsPage(): JSX.Element {
         <div className="container">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Carbon Reduction Actions</h1>
+            <h1 className="mb-2 text-3xl font-bold">Carbon Reduction Actions</h1>
             <p className="text-muted-foreground">
               Browse curated actions to reduce your carbon footprint. Each action includes
               quantified impact estimates and implementation guides.
@@ -56,7 +56,7 @@ export default function ActionsPage(): JSX.Element {
           </div>
 
           {/* Summary Cards */}
-          <div className="grid sm:grid-cols-3 gap-4 mb-8">
+          <div className="mb-8 grid gap-4 sm:grid-cols-3">
             <Card>
               <CardContent className="pt-6">
                 <p className="text-sm text-muted-foreground">Available Actions</p>
@@ -80,36 +80,38 @@ export default function ActionsPage(): JSX.Element {
           </div>
 
           {/* Category Filter */}
-          <div className="flex flex-wrap gap-2 mb-6">
+          <div className="mb-6 flex flex-wrap gap-2">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
                 className={cn(
-                  'px-4 py-2 rounded-full text-sm font-medium transition-colors',
+                  'rounded-full px-4 py-2 text-sm font-medium transition-colors',
                   activeCategory === cat
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-secondary text-secondary-foreground hover:bg-accent'
                 )}
                 aria-pressed={activeCategory === cat}
               >
-                {cat === 'all' ? 'All' : `${CATEGORY_ICONS[cat]} ${cat.charAt(0).toUpperCase() + cat.slice(1)}`}
+                {cat === 'all'
+                  ? 'All'
+                  : `${CATEGORY_ICONS[cat]} ${cat.charAt(0).toUpperCase() + cat.slice(1)}`}
               </button>
             ))}
           </div>
 
           {/* Actions Grid */}
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid gap-4 md:grid-cols-2">
             {filteredActions.map((action) => {
-              const isCommitted = committedActions.includes(action.id);
-              const progress = actionProgress[action.id] || 0;
-              const isSelected = selectedAction === action.id;
+              const isCommitted = committedActions.includes(action.id)
+              const progress = actionProgress[action.id] || 0
+              const isSelected = selectedAction === action.id
 
               return (
                 <Card
                   key={action.id}
                   className={cn(
-                    'transition-all cursor-pointer',
+                    'cursor-pointer transition-all',
                     isSelected ? 'ring-2 ring-primary' : 'hover:shadow-md'
                   )}
                   onClick={() => setSelectedAction(isSelected ? null : action.id)}
@@ -117,21 +119,27 @@ export default function ActionsPage(): JSX.Element {
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
+                        <div className="mb-1 flex items-center gap-2">
                           <span className="text-lg">{CATEGORY_ICONS[action.category]}</span>
                           <CardTitle className="text-lg">{action.title}</CardTitle>
                         </div>
                         <CardDescription>{action.description}</CardDescription>
                       </div>
                       <Badge
-                        variant={action.difficulty === 'easy' ? 'success' : action.difficulty === 'medium' ? 'warning' : 'destructive'}
+                        variant={
+                          action.difficulty === 'easy'
+                            ? 'success'
+                            : action.difficulty === 'medium'
+                              ? 'warning'
+                              : 'destructive'
+                        }
                       >
                         {action.difficulty}
                       </Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-center gap-4 mb-3 text-sm">
+                    <div className="mb-3 flex items-center gap-4 text-sm">
                       <span className="font-medium text-green-600">
                         Save {formatCarbonValue(action.impactScore)} CO₂e/yr
                       </span>
@@ -143,7 +151,7 @@ export default function ActionsPage(): JSX.Element {
 
                     {isCommitted && (
                       <div className="mb-3">
-                        <div className="flex justify-between text-sm mb-1">
+                        <div className="mb-1 flex justify-between text-sm">
                           <span>Progress</span>
                           <span>{progress}%</span>
                         </div>
@@ -159,9 +167,9 @@ export default function ActionsPage(): JSX.Element {
                             size="sm"
                             className="flex-1"
                             onClick={(e) => {
-                              e.stopPropagation();
-                              const newProgress = Math.min(100, progress + 25);
-                              updateActionProgress(action.id, newProgress);
+                              e.stopPropagation()
+                              const newProgress = Math.min(100, progress + 25)
+                              updateActionProgress(action.id, newProgress)
                             }}
                           >
                             Update Progress
@@ -170,8 +178,8 @@ export default function ActionsPage(): JSX.Element {
                             variant="destructive"
                             size="sm"
                             onClick={(e) => {
-                              e.stopPropagation();
-                              uncommitAction(action.id);
+                              e.stopPropagation()
+                              uncommitAction(action.id)
                             }}
                           >
                             Uncommit
@@ -182,8 +190,8 @@ export default function ActionsPage(): JSX.Element {
                           className="w-full"
                           size="sm"
                           onClick={(e) => {
-                            e.stopPropagation();
-                            commitAction(action.id);
+                            e.stopPropagation()
+                            commitAction(action.id)
                           }}
                         >
                           Commit to Action
@@ -193,18 +201,18 @@ export default function ActionsPage(): JSX.Element {
 
                     {/* Expanded Details */}
                     {isSelected && (
-                      <div className="mt-4 pt-4 border-t space-y-3 animate-fade-in">
+                      <div className="animate-fade-in mt-4 space-y-3 border-t pt-4">
                         <div>
-                          <h4 className="font-semibold text-sm mb-2">Prerequisites</h4>
-                          <ul className="list-disc list-inside text-sm text-muted-foreground">
+                          <h4 className="mb-2 text-sm font-semibold">Prerequisites</h4>
+                          <ul className="list-inside list-disc text-sm text-muted-foreground">
                             {action.prerequisites.map((pre, i) => (
                               <li key={i}>{pre}</li>
                             ))}
                           </ul>
                         </div>
                         <div>
-                          <h4 className="font-semibold text-sm mb-2">Steps</h4>
-                          <ol className="list-decimal list-inside text-sm text-muted-foreground space-y-1">
+                          <h4 className="mb-2 text-sm font-semibold">Steps</h4>
+                          <ol className="list-inside list-decimal space-y-1 text-sm text-muted-foreground">
                             {action.steps.map((step, i) => (
                               <li key={i}>{step}</li>
                             ))}
@@ -212,7 +220,7 @@ export default function ActionsPage(): JSX.Element {
                         </div>
                         {action.resources.length > 0 && (
                           <div>
-                            <h4 className="font-semibold text-sm mb-2">Resources</h4>
+                            <h4 className="mb-2 text-sm font-semibold">Resources</h4>
                             <div className="flex flex-wrap gap-2">
                               {action.resources.map((resource, i) => (
                                 <a
@@ -233,11 +241,11 @@ export default function ActionsPage(): JSX.Element {
                     )}
                   </CardContent>
                 </Card>
-              );
+              )
             })}
           </div>
         </div>
       </main>
     </>
-  );
+  )
 }

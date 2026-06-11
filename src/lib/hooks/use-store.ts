@@ -1,6 +1,13 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { OnboardingData, UserProfile, CarbonProfile, Insight, TrendData, ToastData } from '@/types'
+import type {
+  OnboardingData,
+  UserProfile,
+  CarbonProfile,
+  Insight,
+  TrendData,
+  ToastData,
+} from '@/types'
 import { buildCarbonProfile } from '@/lib/utils/calculator'
 
 const ONBOARDING_COMPLETE_STEP = 5
@@ -73,7 +80,9 @@ export const useStore = create<AppState>()(
 
       updateUserProfile: (updates): void => {
         const current = get().userProfile
-        if (!current) {return}
+        if (!current) {
+          return
+        }
         set({
           userProfile: { ...current, ...updates, updatedAt: new Date().toISOString() },
         })
@@ -87,7 +96,11 @@ export const useStore = create<AppState>()(
         const { userProfile } = get()
         if (userProfile) {
           set({
-            userProfile: { ...userProfile, onboardingComplete: true, updatedAt: new Date().toISOString() },
+            userProfile: {
+              ...userProfile,
+              onboardingComplete: true,
+              updatedAt: new Date().toISOString(),
+            },
             onboardingStep: ONBOARDING_COMPLETE_STEP,
           })
         }
@@ -95,7 +108,9 @@ export const useStore = create<AppState>()(
 
       calculateProfile: (): void => {
         const { onboardingData, userProfile } = get()
-        if (!onboardingData || !userProfile) {return}
+        if (!onboardingData || !userProfile) {
+          return
+        }
 
         const profile = buildCarbonProfile(onboardingData, userProfile.region)
 
@@ -165,7 +180,9 @@ export const useStore = create<AppState>()(
       setActiveTab: (tab): void => set({ activeTab: tab }),
 
       showToast: (message, type): void => {
-        if (toastTimeoutId) {clearTimeout(toastTimeoutId)}
+        if (toastTimeoutId) {
+          clearTimeout(toastTimeoutId)
+        }
         set({ toast: { message, type } })
         toastTimeoutId = setTimeout((): void => {
           set({ toast: null })

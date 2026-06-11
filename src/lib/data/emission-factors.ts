@@ -4,7 +4,7 @@
  * All values in kg CO2e per specified unit
  */
 
-import { EmissionFactor } from '@/types';
+import { EmissionFactor } from '@/types'
 
 export const EMISSION_FACTORS: EmissionFactor[] = [
   // ==================== TRANSPORT ====================
@@ -434,7 +434,7 @@ export const EMISSION_FACTORS: EmissionFactor[] = [
     year: 2023,
     confidence: 'medium',
   },
-];
+]
 
 /**
  * Get emission factor by category and subcategory
@@ -452,14 +452,14 @@ export function getEmissionFactor(
     EMISSION_FACTORS.find(
       (f) => f.category === category && f.subcategory === subcategory && f.region === 'global'
     )
-  );
+  )
 }
 
 /**
  * Get all factors for a category
  */
 export function getFactorsByCategory(category: string): EmissionFactor[] {
-  return EMISSION_FACTORS.filter((f) => f.category === category);
+  return EMISSION_FACTORS.filter((f) => f.category === category)
 }
 
 /**
@@ -476,7 +476,7 @@ export const REGIONAL_AVERAGES: Record<string, number> = {
   australia: 17000,
   japan: 8500,
   brazil: 4200,
-};
+}
 
 /**
  * Carbon score thresholds (kg CO2e/year)
@@ -487,4 +487,4 @@ export const CARBON_SCORE_TARGETS = {
   good: 4000, // Paris agreement aligned
   average: 6000, // Global average target
   poor: 10000, // Above average
-};
+}

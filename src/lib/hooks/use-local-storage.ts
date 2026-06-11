@@ -11,13 +11,12 @@ const MAX_ITEM_SIZE_CHARS = 100_000
 const MAX_SERIALIZED_SIZE_CHARS = 500_000
 const WARN_COOLDOWN_MS = 5000
 
-
 // Rate limiting configuration
 const RATE_LIMIT = {
-  maxOperations: 10,      // Max 10 operations per window
-  windowMs: 1000,         // 1 second window
+  maxOperations: 10, // Max 10 operations per window
+  windowMs: 1000, // 1 second window
   maxStorageSize: 5 * 1024 * 1024, // 5MB limit (localStorage typical max ~5-10MB)
-  keyMaxLength: 256,      // Prevent key flooding
+  keyMaxLength: 256, // Prevent key flooding
 }
 
 interface RateLimitState {
@@ -39,7 +38,9 @@ function checkRateLimit(state: RateLimitState): { allowed: boolean; warning: boo
 }
 
 function getStorageSize(): number {
-  if (!isClient()) {return 0}
+  if (!isClient()) {
+    return 0
+  }
   let total = 0
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i) || ''
@@ -57,12 +58,14 @@ function sanitizeKey(key: string): string {
     .slice(0, RATE_LIMIT.keyMaxLength)
 }
 
-type UseLocalStorageReturn<T> = [T, (value: T | ((prev: T) => T)) => void, () => void, { error: string | null; rateLimited: boolean }]
+type UseLocalStorageReturn<T> = [
+  T,
+  (value: T | ((prev: T) => T)) => void,
+  () => void,
+  { error: string | null; rateLimited: boolean },
+]
 
-export function useLocalStorage<T>(
-  key: string,
-  initialValue: T
-): UseLocalStorageReturn<T> {
+export function useLocalStorage<T>(key: string, initialValue: T): UseLocalStorageReturn<T> {
   const sanitizedKey = sanitizeKey(key)
   const rateLimitRef = useRef<RateLimitState>({ operations: [], lastWarning: 0 })
   const [error, setError] = useState<string | null>(null)
@@ -70,10 +73,14 @@ export function useLocalStorage<T>(
 
   // Initialize state with value from localStorage or initialValue
   const [storedValue, setStoredValue] = useState<T>(() => {
-    if (!isClient()) {return initialValue}
+    if (!isClient()) {
+      return initialValue
+    }
     try {
       const item = window.localStorage.getItem(sanitizedKey)
-      if (!item) {return initialValue}
+      if (!item) {
+        return initialValue
+      }
 
       // Validate size before parsing
       if (item.length > MAX_ITEM_SIZE_CHARS) {
@@ -108,7 +115,8 @@ export function useLocalStorage<T>(
         setRateLimited(false)
         setError(null)
 
-        const valueToStore = typeof value === 'function' ? (value as (prev: T) => T)(storedValue) : value
+        const valueToStore =
+          typeof value === 'function' ? (value as (prev: T) => T)(storedValue) : value
 
         // Validate serialized size before storing
         const serialized = JSON.stringify(valueToStore)
@@ -159,7 +167,9 @@ export function useLocalStorage<T>(
 
   // Sync with other tabs/windows
   useEffect((): (() => void) | void => {
-    if (!isClient()) {return}
+    if (!isClient()) {
+      return
+    }
 
     const handleStorageChange = (event: StorageEvent): void => {
       if (event.key === sanitizedKey && event.newValue !== null) {
@@ -187,7 +197,6 @@ export function useLocalStorage<T>(
   }, [sanitizedKey, initialValue])
 
   // Operations array is pruned lazily during checkRateLimit and setValue
-
 
   return [storedValue, setValue, removeValue, { error, rateLimited }]
 }

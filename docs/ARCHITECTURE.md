@@ -9,6 +9,7 @@
 **Decision**: Use Next.js 14 with App Router and static export (`output: 'export'`).
 
 **Consequences**:
+
 - ✅ Excellent performance with Server Components
 - ✅ Built-in SEO optimization
 - ✅ Easy deployment to any static host
@@ -24,6 +25,7 @@
 **Decision**: Use Zustand with persistence middleware.
 
 **Consequences**:
+
 - ✅ Minimal bundle size (~1KB)
 - ✅ No providers needed
 - ✅ Built-in localStorage persistence
@@ -39,6 +41,7 @@
 **Decision**: Store all user data in localStorage via Zustand persistence.
 
 **Consequences**:
+
 - ✅ Zero backend complexity
 - ✅ Instant data availability
 - ✅ Privacy by design (data never leaves browser)
@@ -54,6 +57,7 @@
 **Decision**: Use Recharts with custom tooltip and accessibility wrappers.
 
 **Consequences**:
+
 - ✅ Built on React (no wrapper needed)
 - ✅ Responsive by default
 - ✅ Customizable components
@@ -69,6 +73,7 @@
 **Decision**: Use inline SVG for all icons, logos, and graphics.
 
 **Consequences**:
+
 - ✅ Zero external dependencies
 - ✅ Scalable without quality loss
 - ✅ Tiny file sizes
@@ -84,6 +89,7 @@
 **Decision**: Three-tier testing: Unit (Vitest), Integration (React Testing Library), E2E (Playwright).
 
 **Consequences**:
+
 - ✅ 85%+ coverage target
 - ✅ CI/CD automated testing
 - ✅ Accessibility testing included
@@ -100,6 +106,7 @@
 **Decision**: Build accessibility into every component from day one.
 
 **Consequences**:
+
 - ✅ Screen reader compatible
 - ✅ Keyboard navigable
 - ✅ Color contrast compliant

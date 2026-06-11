@@ -3,7 +3,7 @@
  * Each action includes quantified impact, difficulty, and implementation steps
  */
 
-import { CarbonAction } from '@/types';
+import { CarbonAction } from '@/types'
 
 export const CARBON_ACTIONS: CarbonAction[] = [
   // ==================== TRANSPORT ACTIONS ====================
@@ -43,8 +43,7 @@ export const CARBON_ACTIONS: CarbonAction[] = [
   {
     id: 'action-public-transit',
     title: 'Use Public Transit for Work Commute',
-    description:
-      'Switch from private vehicle to bus, train, or subway for daily commuting.',
+    description: 'Switch from private vehicle to bus, train, or subway for daily commuting.',
     category: 'transport',
     difficulty: 'medium',
     impactScore: 1200,
@@ -99,8 +98,7 @@ export const CARBON_ACTIONS: CarbonAction[] = [
   {
     id: 'action-carpool',
     title: 'Start a Carpool Network',
-    description:
-      'Share rides with colleagues or neighbors for regular commutes.',
+    description: 'Share rides with colleagues or neighbors for regular commutes.',
     category: 'transport',
     difficulty: 'easy',
     impactScore: 600,
@@ -218,8 +216,7 @@ export const CARBON_ACTIONS: CarbonAction[] = [
   {
     id: 'action-reduce-food-waste',
     title: 'Eliminate Household Food Waste',
-    description:
-      'Implement meal planning, proper storage, and composting to reduce waste by 90%.',
+    description: 'Implement meal planning, proper storage, and composting to reduce waste by 90%.',
     category: 'diet',
     difficulty: 'medium',
     impactScore: 350,
@@ -246,8 +243,7 @@ export const CARBON_ACTIONS: CarbonAction[] = [
   {
     id: 'action-plant-based-transition',
     title: 'Transition to Plant-Based Diet',
-    description:
-      'Gradually replace animal products with plant-based alternatives over 3 months.',
+    description: 'Gradually replace animal products with plant-based alternatives over 3 months.',
     category: 'diet',
     difficulty: 'hard',
     impactScore: 1200,
@@ -281,8 +277,7 @@ export const CARBON_ACTIONS: CarbonAction[] = [
   {
     id: 'action-led-lighting',
     title: 'Switch to LED Lighting',
-    description:
-      'Replace all incandescent and CFL bulbs with LED alternatives.',
+    description: 'Replace all incandescent and CFL bulbs with LED alternatives.',
     category: 'energy',
     difficulty: 'easy',
     impactScore: 180,
@@ -337,8 +332,7 @@ export const CARBON_ACTIONS: CarbonAction[] = [
   {
     id: 'action-renewable-energy',
     title: 'Switch to Renewable Energy Provider',
-    description:
-      'Choose a 100% renewable energy supplier or install rooftop solar panels.',
+    description: 'Choose a 100% renewable energy supplier or install rooftop solar panels.',
     category: 'energy',
     difficulty: 'medium',
     impactScore: 2000,
@@ -365,8 +359,7 @@ export const CARBON_ACTIONS: CarbonAction[] = [
   {
     id: 'action-phantom-load',
     title: 'Eliminate Phantom Power Loads',
-    description:
-      'Unplug devices or use smart power strips to eliminate standby power consumption.',
+    description: 'Unplug devices or use smart power strips to eliminate standby power consumption.',
     category: 'energy',
     difficulty: 'easy',
     impactScore: 120,
@@ -393,8 +386,7 @@ export const CARBON_ACTIONS: CarbonAction[] = [
   {
     id: 'action-home-insulation',
     title: 'Improve Home Insulation',
-    description:
-      'Seal air leaks, add insulation to attic and walls, and upgrade windows.',
+    description: 'Seal air leaks, add insulation to attic and walls, and upgrade windows.',
     category: 'energy',
     difficulty: 'hard',
     impactScore: 800,
@@ -451,8 +443,7 @@ export const CARBON_ACTIONS: CarbonAction[] = [
   {
     id: 'action-streaming-quality',
     title: 'Reduce Streaming Quality When Not Needed',
-    description:
-      'Lower video resolution for background viewing and audio-only content.',
+    description: 'Lower video resolution for background viewing and audio-only content.',
     category: 'digital',
     difficulty: 'easy',
     impactScore: 85,
@@ -479,8 +470,7 @@ export const CARBON_ACTIONS: CarbonAction[] = [
   {
     id: 'action-device-longevity',
     title: 'Extend Device Lifespan to 5+ Years',
-    description:
-      'Maintain and repair devices instead of replacing them every 2-3 years.',
+    description: 'Maintain and repair devices instead of replacing them every 2-3 years.',
     category: 'digital',
     difficulty: 'medium',
     impactScore: 300,
@@ -509,8 +499,7 @@ export const CARBON_ACTIONS: CarbonAction[] = [
   {
     id: 'action-buy-less',
     title: 'Implement 30-Day Purchase Rule',
-    description:
-      'Wait 30 days before any non-essential purchase to reduce impulse buying.',
+    description: 'Wait 30 days before any non-essential purchase to reduce impulse buying.',
     category: 'consumption',
     difficulty: 'easy',
     impactScore: 250,
@@ -537,8 +526,7 @@ export const CARBON_ACTIONS: CarbonAction[] = [
   {
     id: 'action-secondhand-first',
     title: 'Buy Secondhand Before New',
-    description:
-      'Prioritize thrift stores, refurbished electronics, and resale platforms.',
+    description: 'Prioritize thrift stores, refurbished electronics, and resale platforms.',
     category: 'consumption',
     difficulty: 'easy',
     impactScore: 400,
@@ -565,8 +553,7 @@ export const CARBON_ACTIONS: CarbonAction[] = [
   {
     id: 'action-repair-culture',
     title: 'Repair Instead of Replace',
-    description:
-      'Fix clothing, electronics, and furniture before discarding them.',
+    description: 'Fix clothing, electronics, and furniture before discarding them.',
     category: 'consumption',
     difficulty: 'medium',
     impactScore: 180,
@@ -593,8 +580,7 @@ export const CARBON_ACTIONS: CarbonAction[] = [
   {
     id: 'action-zero-waste-kit',
     title: 'Build a Zero-Waste Shopping Kit',
-    description:
-      'Eliminate single-use packaging with reusable bags, containers, and bottles.',
+    description: 'Eliminate single-use packaging with reusable bags, containers, and bottles.',
     category: 'consumption',
     difficulty: 'easy',
     impactScore: 150,
@@ -618,20 +604,20 @@ export const CARBON_ACTIONS: CarbonAction[] = [
     isCommitted: false,
     progress: 0,
   },
-];
+]
 
 /**
  * Get actions by category
  */
 export function getActionsByCategory(category: string): CarbonAction[] {
-  return CARBON_ACTIONS.filter((action) => action.category === category);
+  return CARBON_ACTIONS.filter((action) => action.category === category)
 }
 
 /**
  * Get action by ID
  */
 export function getActionById(id: string): CarbonAction | undefined {
-  return CARBON_ACTIONS.find((action) => action.id === id);
+  return CARBON_ACTIONS.find((action) => action.id === id)
 }
 
 /**
@@ -643,27 +629,27 @@ export function getRecommendedActions(
 ): CarbonAction[] {
   const sortedCategories = Object.entries(categoryBreakdown)
     .sort(([, a], [, b]) => b - a)
-    .map(([cat]) => cat);
+    .map(([cat]) => cat)
 
-  const recommendations: CarbonAction[] = [];
+  const recommendations: CarbonAction[] = []
 
   for (const category of sortedCategories) {
     const categoryActions = getActionsByCategory(category)
       .filter((a) => !a.isCommitted)
-      .sort((a, b) => b.impactScore - a.impactScore);
+      .sort((a, b) => b.impactScore - a.impactScore)
 
-    recommendations.push(...categoryActions);
-    if (recommendations.length >= limit) {break;}
+    recommendations.push(...categoryActions)
+    if (recommendations.length >= limit) {
+      break
+    }
   }
 
-  return recommendations.slice(0, limit);
+  return recommendations.slice(0, limit)
 }
 
 /**
  * Calculate total potential savings from all uncommitted actions
  */
 export function calculateTotalPotentialSavings(actions: CarbonAction[]): number {
-  return actions
-    .filter((a) => !a.isCommitted)
-    .reduce((sum, action) => sum + action.impactScore, 0);
+  return actions.filter((a) => !a.isCommitted).reduce((sum, action) => sum + action.impactScore, 0)
 }

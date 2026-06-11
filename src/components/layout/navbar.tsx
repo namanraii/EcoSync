@@ -3,34 +3,37 @@
  * Responsive top navigation with mobile menu support
  */
 
-'use client';
+'use client'
 
-import * as React from 'react';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { cn } from '@/lib/utils/helpers';
-import { useStore, useUserProfile } from '@/lib/hooks/use-store';
+import * as React from 'react'
+import Link from 'next/link'
+import { usePathname, useRouter } from 'next/navigation'
+import { cn } from '@/lib/utils/helpers'
+import { useStore, useUserProfile } from '@/lib/hooks/use-store'
 
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: '📊' },
   { href: '/actions', label: 'Actions', icon: '⚡' },
   { href: '/insights', label: 'Insights', icon: '💡' },
   { href: '/trends', label: 'Trends', icon: '📈' },
-];
+]
 
 export function Navbar(): JSX.Element {
-  const pathname = usePathname();
-  const router = useRouter();
-  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
-  const userProfile = useUserProfile();
-  const { resetStore } = useStore();
+  const pathname = usePathname()
+  const router = useRouter()
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false)
+  const userProfile = useUserProfile()
+  const { resetStore } = useStore()
 
   const handleReset = (): void => {
-    if (typeof window !== 'undefined' && window.confirm('Are you sure you want to reset all data?')) {
-      resetStore();
-      router.push('/');
+    if (
+      typeof window !== 'undefined' &&
+      window.confirm('Are you sure you want to reset all data?')
+    ) {
+      resetStore()
+      router.push('/')
     }
-  };
+  }
 
   return (
     <nav className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -38,7 +41,7 @@ export function Navbar(): JSX.Element {
         {/* Logo */}
         <Link
           href="/"
-          className="flex items-center gap-2 text-xl font-bold text-primary hover:opacity-80 transition-opacity"
+          className="flex items-center gap-2 text-xl font-bold text-primary transition-opacity hover:opacity-80"
           aria-label="EcoSync Home"
         >
           <svg
@@ -60,17 +63,17 @@ export function Navbar(): JSX.Element {
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center gap-1">
+        <div className="hidden items-center gap-1 md:flex">
           {userProfile?.onboardingComplete &&
             NAV_ITEMS.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'px-3 py-2 rounded-md text-sm font-medium transition-colors',
+                  'rounded-md px-3 py-2 text-sm font-medium transition-colors',
                   pathname === item.href
                     ? 'bg-primary/10 text-primary'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                    : 'text-muted-foreground hover:bg-accent hover:text-foreground'
                 )}
                 aria-current={pathname === item.href ? 'page' : undefined}
               >
@@ -87,7 +90,7 @@ export function Navbar(): JSX.Element {
           {userProfile?.onboardingComplete && (
             <button
               onClick={handleReset}
-              className="hidden sm:inline-flex items-center px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-destructive transition-colors rounded-md hover:bg-destructive/10"
+              className="hidden items-center rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive sm:inline-flex"
               aria-label="Reset all data"
             >
               Reset Data
@@ -96,7 +99,7 @@ export function Navbar(): JSX.Element {
 
           {/* Mobile menu button */}
           <button
-            className="md:hidden p-2 rounded-md hover:bg-accent"
+            className="rounded-md p-2 hover:bg-accent md:hidden"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-expanded={mobileMenuOpen}
             aria-label="Toggle mobile menu"
@@ -132,22 +135,18 @@ export function Navbar(): JSX.Element {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div
-          id="mobile-menu"
-          className="md:hidden border-t bg-background"
-          role="menu"
-        >
-          <div className="container py-3 space-y-1">
+        <div id="mobile-menu" className="border-t bg-background md:hidden" role="menu">
+          <div className="container space-y-1 py-3">
             {userProfile?.onboardingComplete ? (
               NAV_ITEMS.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    'flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors',
+                    'flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors',
                     pathname === item.href
                       ? 'bg-primary/10 text-primary'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                      : 'text-muted-foreground hover:bg-accent hover:text-foreground'
                   )}
                   onClick={() => setMobileMenuOpen(false)}
                   role="menuitem"
@@ -161,7 +160,7 @@ export function Navbar(): JSX.Element {
             ) : (
               <Link
                 href="/"
-                className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-primary"
+                className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-primary"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Start Onboarding
@@ -171,5 +170,5 @@ export function Navbar(): JSX.Element {
         </div>
       )}
     </nav>
-  );
+  )
 }

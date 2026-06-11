@@ -28,9 +28,7 @@ export const CategoryBarChart = React.memo(function CategoryBarChart({
   const chartId = React.useId()
 
   const chartData = React.useMemo(() => {
-    return data
-      .filter((item) => item.value > 0)
-      .sort((a, b) => b.value - a.value)
+    return data.filter((item) => item.value > 0).sort((a, b) => b.value - a.value)
   }, [data])
 
   if (chartData.length === 0) {
@@ -41,23 +39,19 @@ export const CategoryBarChart = React.memo(function CategoryBarChart({
           <CardDescription>No category data available</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">Complete the onboarding to see category comparisons.</p>
+          <p className="text-muted-foreground">
+            Complete the onboarding to see category comparisons.
+          </p>
         </CardContent>
       </Card>
     )
   }
 
   return (
-    <Card
-      role="region"
-      aria-label={ariaLabel}
-      aria-describedby={`${chartId}-desc`}
-    >
+    <Card role="region" aria-label={ariaLabel} aria-describedby={`${chartId}-desc`}>
       <CardHeader>
         <CardTitle>Category Comparison</CardTitle>
-        <CardDescription id={`${chartId}-desc`}>
-          {ariaDescription}
-        </CardDescription>
+        <CardDescription id={`${chartId}-desc`}>{ariaDescription}</CardDescription>
       </CardHeader>
       <CardContent>
         {/* Visually hidden data table for screen readers */}

@@ -46,12 +46,16 @@ export function FocusTrap({
 
   // Handle Tab key to trap focus
   React.useEffect((): (() => void) | void => {
-    if (!isActive) {return}
+    if (!isActive) {
+      return
+    }
 
     const handleKeyDown = (e: KeyboardEvent): void => {
       if (e.key === 'Tab') {
         const focusable = getFocusableElements(containerRef.current)
-        if (focusable.length === 0) {return}
+        if (focusable.length === 0) {
+          return
+        }
 
         const first = focusable[0]
         const last = focusable[focusable.length - 1]
@@ -59,12 +63,16 @@ export function FocusTrap({
         if (e.shiftKey) {
           if (document.activeElement === first) {
             e.preventDefault()
-            if (last !== undefined && last !== null) {last.focus()}
+            if (last !== undefined && last !== null) {
+              last.focus()
+            }
           }
         } else {
           if (document.activeElement === last) {
             e.preventDefault()
-            if (first !== undefined && first !== null) {first.focus()}
+            if (first !== undefined && first !== null) {
+              first.focus()
+            }
           }
         }
       }
@@ -89,7 +97,9 @@ export function FocusTrap({
     }
   }, [isActive])
 
-  if (!isActive) {return null}
+  if (!isActive) {
+    return null
+  }
 
   return (
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events
@@ -105,15 +115,15 @@ export function FocusTrap({
         }
       }}
     >
-      <div className="relative w-full max-w-lg rounded-lg bg-background shadow-lg">
-        {children}
-      </div>
+      <div className="relative w-full max-w-lg rounded-lg bg-background shadow-lg">{children}</div>
     </div>
   )
 }
 
 function getFocusableElements(container: HTMLElement | null): HTMLElement[] {
-  if (!container) {return []}
+  if (!container) {
+    return []
+  }
 
   const selector = [
     'a[href]',
@@ -124,9 +134,8 @@ function getFocusableElements(container: HTMLElement | null): HTMLElement[] {
     '[tabindex]:not([tabindex="-1"])',
   ].join(', ')
 
-  return Array.from(container.querySelectorAll(selector))
-    .filter((el) => {
-      const element = el as HTMLElement
-      return element.offsetParent !== null && element.tabIndex >= 0
-    }) as HTMLElement[]
+  return Array.from(container.querySelectorAll(selector)).filter((el) => {
+    const element = el as HTMLElement
+    return element.offsetParent !== null && element.tabIndex >= 0
+  }) as HTMLElement[]
 }

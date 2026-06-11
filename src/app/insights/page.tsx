@@ -3,47 +3,47 @@
  * Personalized insights and recommendations based on carbon profile
  */
 
-'use client';
+'use client'
 
-import * as React from 'react';
-import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { useStore, useCarbonProfile } from '@/lib/hooks/use-store';
-import { formatCarbonValue } from '@/lib/utils/calculator';
-import { REGIONAL_AVERAGES } from '@/lib/data/emission-factors';
-import { cn } from '@/lib/utils/helpers';
+import * as React from 'react'
+import Link from 'next/link'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
+import { useStore, useCarbonProfile } from '@/lib/hooks/use-store'
+import { formatCarbonValue } from '@/lib/utils/calculator'
+import { REGIONAL_AVERAGES } from '@/lib/data/emission-factors'
+import { cn } from '@/lib/utils/helpers'
 
 interface InsightItem {
-  id: string;
-  type: 'warning' | 'opportunity' | 'achievement' | 'comparison';
-  title: string;
-  description: string;
-  category: string;
-  severity: 'low' | 'medium' | 'high';
-  metric?: string;
-  action?: string;
+  id: string
+  type: 'warning' | 'opportunity' | 'achievement' | 'comparison'
+  title: string
+  description: string
+  category: string
+  severity: 'low' | 'medium' | 'high'
+  metric?: string
+  action?: string
 }
 
 export default function InsightsPage(): JSX.Element {
-  const carbonProfile = useCarbonProfile();
-  const { committedActions } = useStore();
+  const carbonProfile = useCarbonProfile()
+  const { committedActions } = useStore()
 
   // Generate insights based on profile data
   const insights: InsightItem[] = React.useMemo(() => {
     if (!carbonProfile) {
-      return [];
+      return []
     }
 
-    const items: InsightItem[] = [];
-    const categories = carbonProfile.categoryBreakdown;
+    const items: InsightItem[] = []
+    const categories = carbonProfile.categoryBreakdown
 
     // Find highest emission category
-    const categoryEntries = Object.entries(categories);
+    const categoryEntries = Object.entries(categories)
     const highestCategory = categoryEntries.reduce((a, b) =>
       a[1].annualKgCO2 > b[1].annualKgCO2 ? a : b
-    );
+    )
 
     // Warning insight for highest category
     if (highestCategory[1].annualKgCO2 > 2000) {
@@ -56,12 +56,12 @@ export default function InsightsPage(): JSX.Element {
         severity: 'high',
         metric: `${formatCarbonValue(highestCategory[1].annualKgCO2)} CO₂e/year`,
         action: 'View recommended actions for this category',
-      });
+      })
     }
 
     // Comparison insight
-    const globalAverage = REGIONAL_AVERAGES['global'] ?? 12000;
-    const diff = carbonProfile.totalAnnualKgCO2 - globalAverage;
+    const globalAverage = REGIONAL_AVERAGES['global'] ?? 12000
+    const diff = carbonProfile.totalAnnualKgCO2 - globalAverage
     if (diff > 0) {
       items.push({
         id: 'above-average',
@@ -71,7 +71,7 @@ export default function InsightsPage(): JSX.Element {
         category: 'overall',
         severity: 'medium',
         metric: `+${formatCarbonValue(diff)} vs global avg`,
-      });
+      })
     } else {
       items.push({
         id: 'below-average',
@@ -81,12 +81,12 @@ export default function InsightsPage(): JSX.Element {
         category: 'overall',
         severity: 'low',
         metric: `${formatCarbonValue(Math.abs(diff))} below avg`,
-      });
+      })
     }
 
     // Category-specific insights
     categoryEntries.forEach(([key, category]) => {
-      const threshold = 1500;
+      const threshold = 1500
       if (category.annualKgCO2 > threshold) {
         items.push({
           id: `${key}-high`,
@@ -96,13 +96,13 @@ export default function InsightsPage(): JSX.Element {
           category: key,
           severity: 'medium',
           metric: `Save ${formatCarbonValue(category.annualKgCO2 * 0.3)}/yr`,
-        });
+        })
       }
-    });
+    })
 
     // Achievement for committed actions
     if (committedActions.length > 0) {
-      const totalSavings = committedActions.length * 200;
+      const totalSavings = committedActions.length * 200
       items.push({
         id: 'actions-committed',
         type: 'achievement',
@@ -111,7 +111,7 @@ export default function InsightsPage(): JSX.Element {
         category: 'overall',
         severity: 'low',
         metric: `${formatCarbonValue(totalSavings)} potential savings`,
-      });
+      })
     }
 
     // Score-based insight
@@ -124,40 +124,46 @@ export default function InsightsPage(): JSX.Element {
         category: 'overall',
         severity: 'low',
         metric: `${carbonProfile.overallScore}/100`,
-      });
+      })
     } else if (carbonProfile.overallScore < 30) {
       items.push({
         id: 'low-score',
         type: 'warning',
         title: 'Carbon Score Needs Improvement',
-        description: 'Your carbon score is in the critical range. Focus on high-impact actions to see quick improvements.',
+        description:
+          'Your carbon score is in the critical range. Focus on high-impact actions to see quick improvements.',
         category: 'overall',
         severity: 'high',
         metric: `${carbonProfile.overallScore}/100`,
-      });
+      })
     }
 
-    return items;
-  }, [carbonProfile, committedActions]);
+    return items
+  }, [carbonProfile, committedActions])
 
   if (!carbonProfile) {
     return (
       <>
-        <main className="flex-1 flex flex-col items-center justify-center py-20 text-center">
-          <Card className="max-w-md mx-auto">
+        <main className="flex flex-1 flex-col items-center justify-center py-20 text-center">
+          <Card className="mx-auto max-w-md">
             <CardHeader>
               <CardTitle>No Profile Found</CardTitle>
-              <CardDescription>Complete the onboarding to see personalized insights.</CardDescription>
+              <CardDescription>
+                Complete the onboarding to see personalized insights.
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <Link href="/onboarding" className="block w-full bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90">
+              <Link
+                href="/onboarding"
+                className="block w-full rounded-md bg-primary px-4 py-2 text-primary-foreground hover:bg-primary/90"
+              >
                 Start Onboarding
               </Link>
             </CardContent>
           </Card>
         </main>
       </>
-    );
+    )
   }
 
   const typeConfig = {
@@ -165,13 +171,13 @@ export default function InsightsPage(): JSX.Element {
     opportunity: { icon: '💡', color: 'border-l-blue-500 bg-blue-50' },
     achievement: { icon: '🏆', color: 'border-l-green-500 bg-green-50' },
     comparison: { icon: '📊', color: 'border-l-purple-500 bg-purple-50' },
-  };
+  }
 
   const severityConfig = {
     low: 'bg-green-100 text-green-800',
     medium: 'bg-yellow-100 text-yellow-800',
     high: 'bg-red-100 text-red-800',
-  };
+  }
 
   return (
     <>
@@ -179,61 +185,56 @@ export default function InsightsPage(): JSX.Element {
         <div className="container">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Personalized Insights</h1>
+            <h1 className="mb-2 text-3xl font-bold">Personalized Insights</h1>
             <p className="text-muted-foreground">
               AI-generated insights based on your carbon profile and behavior patterns.
             </p>
           </div>
 
           {/* Insights Count */}
-          <div className="grid sm:grid-cols-4 gap-4 mb-8">
+          <div className="mb-8 grid gap-4 sm:grid-cols-4">
             {(['warning', 'opportunity', 'achievement', 'comparison'] as const).map((type) => {
-              const count = insights.filter((i) => i.type === type).length;
+              const count = insights.filter((i) => i.type === type).length
               return (
                 <Card key={type}>
                   <CardContent className="pt-6">
                     <div className="flex items-center gap-2">
                       <span className="text-2xl">{typeConfig[type].icon}</span>
                       <div>
-                        <p className="text-sm text-muted-foreground capitalize">{type}s</p>
+                        <p className="text-sm capitalize text-muted-foreground">{type}s</p>
                         <p className="text-2xl font-bold">{count}</p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
-              );
+              )
             })}
           </div>
 
           {/* Insights List */}
           <div className="space-y-4">
             {insights.map((insight) => {
-              const config = typeConfig[insight.type];
+              const config = typeConfig[insight.type]
               return (
-                <Card
-                  key={insight.id}
-                  className={cn('border-l-4', config.color)}
-                >
+                <Card key={insight.id} className={cn('border-l-4', config.color)}>
                   <CardContent className="pt-6">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
+                        <div className="mb-2 flex items-center gap-2">
                           <span className="text-xl">{config.icon}</span>
                           <h3 className="font-semibold">{insight.title}</h3>
                           <Badge className={severityConfig[insight.severity]}>
                             {insight.severity}
                           </Badge>
                         </div>
-                        <p className="text-muted-foreground mb-2">{insight.description}</p>
+                        <p className="mb-2 text-muted-foreground">{insight.description}</p>
                         {insight.metric && (
-                          <p className="text-sm font-medium text-primary">
-                            {insight.metric}
-                          </p>
+                          <p className="text-sm font-medium text-primary">{insight.metric}</p>
                         )}
                         {insight.action && (
                           <Link
                             href="/actions"
-                            className="text-sm text-primary hover:underline mt-2 inline-block"
+                            className="mt-2 inline-block text-sm text-primary hover:underline"
                           >
                             {insight.action} →
                           </Link>
@@ -242,7 +243,7 @@ export default function InsightsPage(): JSX.Element {
                     </div>
                   </CardContent>
                 </Card>
-              );
+              )
             })}
           </div>
 
@@ -258,5 +259,5 @@ export default function InsightsPage(): JSX.Element {
         </div>
       </main>
     </>
-  );
+  )
 }

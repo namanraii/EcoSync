@@ -1,14 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  ResponsiveContainer,
-  Sector,
-} from 'recharts'
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Sector } from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import type { BreakdownItem } from '@/types'
 
@@ -33,10 +26,8 @@ interface CustomActiveShapeProps {
 
 // Memoized active shape for performance
 const renderActiveShape = (props: unknown): JSX.Element => {
-  const {
-    cx, cy, innerRadius, outerRadius, startAngle, endAngle,
-    fill, payload, percent
-  } = props as CustomActiveShapeProps
+  const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill, payload, percent } =
+    props as CustomActiveShapeProps
 
   return (
     <g>
@@ -73,17 +64,14 @@ export const CarbonDonutChart = React.memo(function CarbonDonutChart({
   data,
   total,
   ariaLabel = 'Carbon emission breakdown by category',
-  ariaDescription = 'Donut chart showing the distribution of carbon emissions across different categories'
+  ariaDescription = 'Donut chart showing the distribution of carbon emissions across different categories',
 }: CarbonDonutChartProps): JSX.Element {
   const [activeIndex, setActiveIndex] = React.useState(0)
   const chartId = React.useId()
 
-  const onPieEnter = React.useCallback(
-    (_: unknown, index: number) => {
-      setActiveIndex(index)
-    },
-    []
-  )
+  const onPieEnter = React.useCallback((_: unknown, index: number) => {
+    setActiveIndex(index)
+  }, [])
 
   // Filter out zero values and sort by percentage descending
   const chartData = React.useMemo(() => {
@@ -113,11 +101,7 @@ export const CarbonDonutChart = React.memo(function CarbonDonutChart({
   }
 
   return (
-    <Card
-      role="region"
-      aria-label={ariaLabel}
-      aria-describedby={`${chartId}-desc`}
-    >
+    <Card role="region" aria-label={ariaLabel} aria-describedby={`${chartId}-desc`}>
       <CardHeader>
         <CardTitle>Emission Breakdown</CardTitle>
         <CardDescription id={`${chartId}-desc`}>
@@ -164,11 +148,7 @@ export const CarbonDonutChart = React.memo(function CarbonDonutChart({
                 isAnimationActive={true}
               >
                 {chartData.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={entry.color}
-                    stroke="none"
-                  />
+                  <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
                 ))}
               </Pie>
               <Tooltip

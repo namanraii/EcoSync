@@ -16,11 +16,7 @@ export function AriaLiveRegion({
   className = 'sr-only',
 }: AriaLiveRegionProps): JSX.Element {
   return (
-    <div
-      aria-live={ariaLive}
-      aria-atomic={ariaAtomic}
-      className={className}
-    >
+    <div aria-live={ariaLive} aria-atomic={ariaAtomic} className={className}>
       {children}
     </div>
   )

@@ -62,11 +62,7 @@ export const CarbonTrendChart = React.memo(function CarbonTrendChart({
   }
 
   return (
-    <Card
-      role="region"
-      aria-label={ariaLabel}
-      aria-describedby={`${chartId}-desc`}
-    >
+    <Card role="region" aria-label={ariaLabel} aria-describedby={`${chartId}-desc`}>
       <CardHeader>
         <CardTitle>Trend Analysis</CardTitle>
         <CardDescription id={`${chartId}-desc`}>

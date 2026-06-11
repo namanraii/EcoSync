@@ -35,10 +35,7 @@ export class ChartErrorBoundary extends React.Component<
   override render(): React.ReactNode {
     if (this.state.hasError) {
       return (
-        <Card
-          role="region"
-          aria-label={this.props.ariaLabel || 'Chart error'}
-        >
+        <Card role="region" aria-label={this.props.ariaLabel || 'Chart error'}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-destructive">
               <AlertTriangle className="h-5 w-5" aria-hidden="true" />

@@ -55,7 +55,9 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
   }
 
   /* Focus visible styles for keyboard navigation */
@@ -114,7 +116,7 @@
 
   /* Card styles for print */
   .card,
-  [class*="card"] {
+  [class*='card'] {
     border: 1px solid #ddd !important;
     box-shadow: none !important;
     break-inside: avoid;
@@ -128,7 +130,12 @@
   }
 
   /* Typography for print */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     color: black !important;
     page-break-after: avoid;
   }
@@ -140,13 +147,13 @@
 
   /* Links for print - show URL after link text */
   a[href]::after {
-    content: " (" attr(href) ")";
+    content: ' (' attr(href) ')';
     font-size: 0.8em;
     color: #666;
   }
 
-  a[href^="/"]::after {
-    content: " (https://ecosync.vercel.app" attr(href) ")";
+  a[href^='/']::after {
+    content: ' (https://ecosync.vercel.app' attr(href) ')';
   }
 
   /* Page breaks */
@@ -206,7 +213,8 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {

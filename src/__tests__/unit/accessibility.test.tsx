@@ -49,22 +49,14 @@ describe('Accessibility Compliance', () => {
 
   describe('AriaLiveRegion', () => {
     it('should have aria-live attribute', () => {
-      render(
-        <AriaLiveRegion aria-live="polite">
-          Score updated to 75
-        </AriaLiveRegion>
-      )
+      render(<AriaLiveRegion aria-live="polite">Score updated to 75</AriaLiveRegion>)
       const region = screen.getByText('Score updated to 75')
       expect(region).toHaveAttribute('aria-live', 'polite')
       expect(region).toHaveAttribute('aria-atomic', 'true')
     })
 
     it('should be visually hidden but accessible to screen readers', () => {
-      render(
-        <AriaLiveRegion aria-live="assertive">
-          Error: Invalid input
-        </AriaLiveRegion>
-      )
+      render(<AriaLiveRegion aria-live="assertive">Error: Invalid input</AriaLiveRegion>)
       const region = screen.getByText('Error: Invalid input')
       expect(region).toHaveClass('sr-only')
     })
@@ -83,7 +75,9 @@ describe('Accessibility Compliance', () => {
 
     it('should announce score decrease', () => {
       render(<ScoreAnnouncement score={60} previousScore={75} />)
-      expect(screen.getByText('Your carbon score decreased by 15 points to 60.')).toBeInTheDocument()
+      expect(
+        screen.getByText('Your carbon score decreased by 15 points to 60.')
+      ).toBeInTheDocument()
     })
 
     it('should announce no change', () => {

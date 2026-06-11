@@ -3,40 +3,37 @@
  * Accessible dropdown with keyboard navigation
  */
 
-import * as React from 'react';
-import { cn } from '@/lib/utils/helpers';
+import * as React from 'react'
+import { cn } from '@/lib/utils/helpers'
 
 export interface SelectOption {
-  value: string;
-  label: string;
-  disabled?: boolean;
+  value: string
+  label: string
+  disabled?: boolean
 }
 
 export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
-  label?: string;
-  error?: string;
-  helperText?: string;
-  options: SelectOption[];
-  placeholder?: string;
+  label?: string
+  error?: string
+  helperText?: string
+  options: SelectOption[]
+  placeholder?: string
 }
 
 const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, label, error, helperText, options, placeholder, id, ...props }, ref) => {
-    const defaultId = React.useId();
-    const selectId = id || defaultId;
-    const errorId = `${selectId}-error`;
-    const helperId = `${selectId}-helper`;
+    const defaultId = React.useId()
+    const selectId = id || defaultId
+    const errorId = `${selectId}-error`
+    const helperId = `${selectId}-helper`
 
     return (
       <div className="w-full">
         {label && (
-          <label
-            htmlFor={selectId}
-            className="mb-1.5 block text-sm font-medium text-foreground"
-          >
+          <label htmlFor={selectId} className="mb-1.5 block text-sm font-medium text-foreground">
             {label}
             {props.required && (
-              <span className="text-red-500 ml-1" aria-hidden="true">
+              <span className="ml-1 text-red-500" aria-hidden="true">
                 *
               </span>
             )}
@@ -76,10 +73,10 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           </p>
         )}
       </div>
-    );
+    )
   }
-);
+)
 
-Select.displayName = 'Select';
+Select.displayName = 'Select'
 
-export { Select };
+export { Select }

@@ -4,12 +4,17 @@ import * as React from 'react'
 import { useRouter } from 'next/navigation'
 import { ChevronRight, ChevronLeft, Check, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { useStore } from '@/lib/hooks/use-store'
 import { validateOnboardingData } from '@/lib/utils/validation'
 import type { OnboardingData } from '@/types'
+
+import { TransportStep } from './onboarding-steps/TransportStep'
+import { DietStep } from './onboarding-steps/DietStep'
+import { EnergyStep } from './onboarding-steps/EnergyStep'
+import { DigitalStep } from './onboarding-steps/DigitalStep'
+import { ConsumptionStep } from './onboarding-steps/ConsumptionStep'
 
 interface WizardStep {
   id: string
@@ -56,7 +61,9 @@ export default function OnboardingWizard(): JSX.Element {
 
   React.useEffect((): (() => void) => {
     return () => {
-      if (timerRef.current) {clearTimeout(timerRef.current)}
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+      }
     }
   }, [])
 
@@ -185,360 +192,38 @@ export default function OnboardingWizard(): JSX.Element {
     switch (currentStep) {
       case 0:
         return (
-          <div className="space-y-6" role="group" aria-label="Transport information">
-            <div>
-              <label htmlFor="vehicle-type" className="mb-2 block text-sm font-medium">
-                Primary Vehicle
-              </label>
-              <select
-                id="vehicle-type"
-                value={formData.transport.primaryVehicle}
-                onChange={(e) => updateField('transport', 'primaryVehicle', e.target.value)}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                aria-describedby="vehicle-help"
-              >
-                <option value="petrol_car">Petrol Car</option>
-                <option value="diesel_car">Diesel Car</option>
-                <option value="electric_car">Electric Car</option>
-                <option value="hybrid_car">Hybrid Car</option>
-                <option value="motorcycle">Motorcycle</option>
-                <option value="bicycle">Bicycle</option>
-                <option value="walking">Walking</option>
-                <option value="public_bus">Public Bus</option>
-                <option value="train">Train</option>
-                <option value="subway">Subway</option>
-              </select>
-              <p id="vehicle-help" className="mt-1 text-xs text-muted-foreground">
-                Select your most frequently used mode of transport
-              </p>
-            </div>
-
-            <Input
-              id="weekly-distance"
-              label="Weekly Distance (km)"
-              type="number"
-              min={0}
-              max={5000}
-              pattern="[0-9]*"
-              autoComplete="off"
-              value={formData.transport.weeklyDistanceKm}
-              onChange={(e) => updateField('transport', 'weeklyDistanceKm', Number(e.target.value))}
-              helperText="Approximate kilometers traveled per week"
-            />
-
-            <div>
-              <label htmlFor="transit-frequency" className="mb-2 block text-sm font-medium">
-                Public Transit Frequency
-              </label>
-              <select
-                id="transit-frequency"
-                value={formData.transport.publicTransitFrequency}
-                onChange={(e) => updateField('transport', 'publicTransitFrequency', e.target.value)}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="rarely">Rarely</option>
-                <option value="never">Never</option>
-              </select>
-            </div>
-
-            <Input
-              id="flights-per-year"
-              label="Flights Per Year"
-              type="number"
-              min={0}
-              max={100}
-              pattern="[0-9]*"
-              autoComplete="off"
-              value={formData.transport.flightsPerYear}
-              onChange={(e) => updateField('transport', 'flightsPerYear', Number(e.target.value))}
-              helperText="Number of flights taken per year"
-            />
-          </div>
+          <TransportStep
+            data={formData.transport}
+            onChange={(field, value): void => updateField('transport', field, value)}
+          />
         )
       case 1:
         return (
-          <div className="space-y-6" role="group" aria-label="Diet information">
-            <div>
-              <label htmlFor="diet-type" className="mb-2 block text-sm font-medium">
-                Diet Type
-              </label>
-              <select
-                id="diet-type"
-                value={formData.diet.dietType}
-                onChange={(e) => updateField('diet', 'dietType', e.target.value)}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <option value="vegan">Vegan</option>
-                <option value="vegetarian">Vegetarian</option>
-                <option value="pescatarian">Pescatarian</option>
-                <option value="flexitarian">Flexitarian</option>
-                <option value="omnivore">Omnivore</option>
-                <option value="high-meat">High Meat</option>
-              </select>
-            </div>
-
-            <Input
-              id="local-food"
-              label="Local Food Percentage"
-              type="number"
-              min={0}
-              max={100}
-              pattern="[0-9]*"
-              autoComplete="off"
-              value={formData.diet.localFoodPercentage}
-              onChange={(e) => updateField('diet', 'localFoodPercentage', Number(e.target.value))}
-              helperText="Percentage of food sourced locally"
-            />
-
-            <div>
-              <label htmlFor="food-waste" className="mb-2 block text-sm font-medium">
-                Food Waste Frequency
-              </label>
-              <select
-                id="food-waste"
-                value={formData.diet.foodWasteFrequency}
-                onChange={(e) => updateField('diet', 'foodWasteFrequency', e.target.value)}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <option value="never">Never</option>
-                <option value="rarely">Rarely</option>
-                <option value="sometimes">Sometimes</option>
-                <option value="often">Often</option>
-              </select>
-            </div>
-          </div>
+          <DietStep
+            data={formData.diet}
+            onChange={(field, value): void => updateField('diet', field, value)}
+          />
         )
       case 2:
         return (
-          <div className="space-y-6" role="group" aria-label="Energy information">
-            <div>
-              <label htmlFor="home-type" className="mb-2 block text-sm font-medium">
-                Home Type
-              </label>
-              <select
-                id="home-type"
-                value={formData.energy.homeType}
-                onChange={(e) => updateField('energy', 'homeType', e.target.value)}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <option value="apartment">Apartment</option>
-                <option value="house">House</option>
-                <option value="studio">Studio</option>
-              </select>
-            </div>
-
-            <Input
-              id="square-meters"
-              label="Square Meters"
-              type="number"
-              min={5}
-              max={1000}
-              pattern="[0-9]*"
-              autoComplete="off"
-              value={formData.energy.squareMeters}
-              onChange={(e) => updateField('energy', 'squareMeters', Number(e.target.value))}
-              helperText="Total living area in square meters"
-            />
-
-            <Input
-              id="occupants"
-              label="Number of Occupants"
-              type="number"
-              min={1}
-              max={20}
-              pattern="[0-9]*"
-              autoComplete="off"
-              value={formData.energy.occupants}
-              onChange={(e) => updateField('energy', 'occupants', Number(e.target.value))}
-              helperText="Number of people living in your home"
-            />
-
-            <Input
-              id="renewable-percentage"
-              label="Renewable Energy Percentage"
-              type="number"
-              min={0}
-              max={100}
-              pattern="[0-9]*"
-              autoComplete="off"
-              value={formData.energy.renewablePercentage}
-              onChange={(e) => updateField('energy', 'renewablePercentage', Number(e.target.value))}
-              helperText="Percentage of energy from renewable sources"
-            />
-
-            <div>
-              <label htmlFor="heating-type" className="mb-2 block text-sm font-medium">
-                Heating Type
-              </label>
-              <select
-                id="heating-type"
-                value={formData.energy.heatingType}
-                onChange={(e) => updateField('energy', 'heatingType', e.target.value)}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <option value="electric">Electric</option>
-                <option value="gas">Natural Gas</option>
-                <option value="oil">Heating Oil</option>
-                <option value="heat-pump">Heat Pump</option>
-                <option value="solar">Solar</option>
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="ac-usage" className="mb-2 block text-sm font-medium">
-                AC Usage
-              </label>
-              <select
-                id="ac-usage"
-                value={formData.energy.acUsage}
-                onChange={(e) => updateField('energy', 'acUsage', e.target.value)}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <option value="never">Never</option>
-                <option value="occasional">Occasional</option>
-                <option value="regular">Regular</option>
-                <option value="constant">Constant</option>
-              </select>
-            </div>
-          </div>
+          <EnergyStep
+            data={formData.energy}
+            onChange={(field, value): void => updateField('energy', field, value)}
+          />
         )
       case 3:
         return (
-          <div className="space-y-6" role="group" aria-label="Digital footprint information">
-            <Input
-              id="screen-hours"
-              label="Daily Screen Hours"
-              type="number"
-              min={0}
-              max={24}
-              pattern="[0-9]*"
-              autoComplete="off"
-              value={formData.digital.dailyScreenHours}
-              onChange={(e) => updateField('digital', 'dailyScreenHours', Number(e.target.value))}
-              helperText="Average hours spent on screens per day"
-            />
-
-            <Input
-              id="streaming-hours"
-              label="Streaming Hours Per Day"
-              type="number"
-              min={0}
-              max={24}
-              pattern="[0-9]*"
-              autoComplete="off"
-              value={formData.digital.streamingHours}
-              onChange={(e) => updateField('digital', 'streamingHours', Number(e.target.value))}
-              helperText="Hours spent streaming video content daily"
-            />
-
-            <Input
-              id="email-count"
-              label="Daily Email Count"
-              type="number"
-              min={0}
-              max={1000}
-              pattern="[0-9]*"
-              autoComplete="off"
-              value={formData.digital.emailCount}
-              onChange={(e) => updateField('digital', 'emailCount', Number(e.target.value))}
-              helperText="Average emails sent and received per day"
-            />
-
-            <Input
-              id="cloud-storage"
-              label="Cloud Storage (GB)"
-              type="number"
-              min={0}
-              max={10000}
-              pattern="[0-9]*"
-              autoComplete="off"
-              value={formData.digital.cloudStorageGB}
-              onChange={(e) => updateField('digital', 'cloudStorageGB', Number(e.target.value))}
-              helperText="Total cloud storage used in gigabytes"
-            />
-
-            <Input
-              id="device-count"
-              label="Number of Devices"
-              type="number"
-              min={1}
-              max={50}
-              pattern="[0-9]*"
-              autoComplete="off"
-              value={formData.digital.deviceCount}
-              onChange={(e) => updateField('digital', 'deviceCount', Number(e.target.value))}
-              helperText="Total number of connected devices"
-            />
-          </div>
+          <DigitalStep
+            data={formData.digital}
+            onChange={(field, value): void => updateField('digital', field, value)}
+          />
         )
       case 4:
         return (
-          <div className="space-y-6" role="group" aria-label="Consumption information">
-            <Input
-              id="shopping-budget"
-              label="Monthly Shopping Budget"
-              type="number"
-              min={0}
-              max={50000}
-              pattern="[0-9]*"
-              autoComplete="off"
-              value={formData.consumption.monthlyShoppingBudget}
-              onChange={(e) => updateField('consumption', 'monthlyShoppingBudget', Number(e.target.value))}
-              helperText="Monthly spending on non-essential items in your currency"
-            />
-
-            <div>
-              <label htmlFor="clothing-frequency" className="mb-2 block text-sm font-medium">
-                Clothing Purchase Frequency
-              </label>
-              <select
-                id="clothing-frequency"
-                value={formData.consumption.clothingFrequency}
-                onChange={(e) => updateField('consumption', 'clothingFrequency', e.target.value)}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <option value="rarely">Rarely (few times/year)</option>
-                <option value="occasionally">Occasionally (monthly)</option>
-                <option value="monthly">Monthly</option>
-                <option value="weekly">Weekly</option>
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="electronics-frequency" className="mb-2 block text-sm font-medium">
-                Electronics Purchase Frequency
-              </label>
-              <select
-                id="electronics-frequency"
-                value={formData.consumption.electronicsFrequency}
-                onChange={(e) => updateField('consumption', 'electronicsFrequency', e.target.value)}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <option value="yearly">Yearly</option>
-                <option value="bi-yearly">Bi-yearly</option>
-                <option value="rarely">Rarely</option>
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="recycling-habits" className="mb-2 block text-sm font-medium">
-                Recycling Habits
-              </label>
-              <select
-                id="recycling-habits"
-                value={formData.consumption.recyclingHabits}
-                onChange={(e) => updateField('consumption', 'recyclingHabits', e.target.value)}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <option value="always">Always recycle everything</option>
-                <option value="often">Often recycle most items</option>
-                <option value="sometimes">Sometimes recycle</option>
-                <option value="rarely">Rarely recycle</option>
-              </select>
-            </div>
-          </div>
+          <ConsumptionStep
+            data={formData.consumption}
+            onChange={(field, value): void => updateField('consumption', field, value)}
+          />
         )
       default:
         return <div>Unknown step</div>
@@ -557,20 +242,34 @@ export default function OnboardingWizard(): JSX.Element {
               <p className="text-sm text-muted-foreground">
                 Step {currentStep + 1} of {STEPS.length}
               </p>
-              <Progress value={progress} className="mt-2" aria-label="Form completion progress" aria-valuenow={Math.round(progress)} aria-valuemin={0} aria-valuemax={100} />
+              <Progress
+                value={progress}
+                className="mt-2"
+                aria-label="Form completion progress"
+                aria-valuenow={Math.round(progress)}
+                aria-valuemin={0}
+                aria-valuemax={100}
+              />
             </div>
-            <span className="text-sm font-medium text-muted-foreground">{Math.round(progress)}%</span>
+            <span className="text-sm font-medium text-muted-foreground">
+              {Math.round(progress)}%
+            </span>
           </div>
           <CardTitle>{currentStepData?.title ?? ''}</CardTitle>
           <CardDescription>{currentStepData?.description ?? ''}</CardDescription>
         </CardHeader>
 
         <div id="step-announcement" aria-live="polite" aria-atomic="true" className="sr-only">
-          {announcement || `Step ${currentStep + 1} of ${STEPS.length}: ${currentStepData?.title ?? ''}`}
+          {announcement ||
+            `Step ${currentStep + 1} of ${STEPS.length}: ${currentStepData?.title ?? ''}`}
         </div>
 
         {errors.length > 0 && (
-          <div className="mx-6 mb-4 rounded-md border border-destructive/50 bg-destructive/10 p-4" role="alert" aria-label="Form validation errors">
+          <div
+            className="mx-6 mb-4 rounded-md border border-destructive/50 bg-destructive/10 p-4"
+            role="alert"
+            aria-label="Form validation errors"
+          >
             <div className="flex items-center gap-2 text-destructive">
               <AlertCircle className="h-4 w-4" aria-hidden="true" />
               <p className="text-sm font-medium">Please fix the following errors:</p>
@@ -635,9 +334,7 @@ export default function OnboardingWizard(): JSX.Element {
                 <Check className="h-8 w-8 text-green-600" aria-hidden="true" />
               </div>
               <CardTitle>Assessment Complete!</CardTitle>
-              <CardDescription>
-                Calculating your carbon profile...
-              </CardDescription>
+              <CardDescription>Calculating your carbon profile...</CardDescription>
             </CardHeader>
           </Card>
         </div>

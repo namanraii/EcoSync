@@ -3,71 +3,70 @@
  * Hero section with CTA to start onboarding
  */
 
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { CarbonScoreGauge } from '@/components/charts/carbon-score-gauge';
-import { CheckCircle2 } from 'lucide-react';
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { CarbonScoreGauge } from '@/components/charts/carbon-score-gauge'
+import { CheckCircle2 } from 'lucide-react'
 
 export default function HomePage(): JSX.Element {
   return (
     <>
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative overflow-hidden flex items-center min-h-[calc(100vh-4rem)] py-12">
+        <section className="relative flex min-h-[calc(100vh-4rem)] items-center overflow-hidden py-12">
           {/* Faded Nature Background Layer */}
-          <div 
-            className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-40 pointer-events-none"
+          <div
+            className="pointer-events-none absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-40"
             style={{ backgroundImage: 'url("/hero-bg.png")' }}
           />
           {/* Gradient overlay to fade the image into the background color seamlessly */}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background z-0 pointer-events-none" />
-          
+          <div className="pointer-events-none absolute inset-0 z-0 bg-gradient-to-b from-transparent via-background/20 to-background" />
+
           <div className="container relative z-10">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="grid items-center gap-12 lg:grid-cols-2">
               <div className="space-y-6">
-                <div className="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium text-primary bg-primary/10">
+                <div className="inline-flex items-center rounded-full border bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
                   🌱 Hack2Skill PromptWars Challenge 3
                 </div>
-                <h1 className="text-4xl lg:text-6xl font-bold tracking-tight text-foreground">
-                  Understand Your{' '}
-                  <span className="text-primary">Carbon Footprint</span>
+                <h1 className="text-4xl font-bold tracking-tight text-foreground lg:text-6xl">
+                  Understand Your <span className="text-primary">Carbon Footprint</span>
                 </h1>
-                <p className="text-lg text-muted-foreground max-w-lg">
+                <p className="max-w-lg text-lg text-muted-foreground">
                   Track, analyze, and reduce your environmental impact with personalized insights
                   and actionable recommendations. Join thousands taking climate action.
                 </p>
                 <div className="flex flex-wrap gap-4">
                   <Link href="/onboarding">
-                    <Button size="lg" className="text-lg px-8">
+                    <Button size="lg" className="px-8 text-lg">
                       Calculate My Footprint
                     </Button>
                   </Link>
                   <Link href="#features">
-                    <Button size="lg" variant="outline" className="text-lg px-8">
+                    <Button size="lg" variant="outline" className="px-8 text-lg">
                       Learn More
                     </Button>
                   </Link>
                 </div>
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">
-                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
                     Free to use
                   </span>
                   <span className="flex items-center gap-1">
-                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
                     Data stays private
                   </span>
                   <span className="flex items-center gap-1">
-                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
                     Science-based
                   </span>
                 </div>
               </div>
               <div className="flex justify-center">
                 <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-full blur-3xl" />
-                  <Card className="relative w-72 h-72 flex items-center justify-center shadow-2xl">
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/20 to-blue-500/20 blur-3xl" />
+                  <Card className="relative flex h-72 w-72 items-center justify-center shadow-2xl">
                     <CarbonScoreGauge score={65} size="lg" />
                   </Card>
                 </div>
@@ -77,49 +76,49 @@ export default function HomePage(): JSX.Element {
         </section>
 
         {/* Features Section */}
-        <section id="features" className="py-20 bg-muted/30">
+        <section id="features" className="bg-muted/30 py-20">
           <div className="container">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4">How EcoSync Works</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                Our intelligent platform guides you through understanding and reducing your carbon footprint
-                in three simple steps.
+            <div className="mb-12 text-center">
+              <h2 className="mb-4 text-3xl font-bold">How EcoSync Works</h2>
+              <p className="mx-auto max-w-2xl text-muted-foreground">
+                Our intelligent platform guides you through understanding and reducing your carbon
+                footprint in three simple steps.
               </p>
             </div>
-            <div className="grid md:grid-cols-3 gap-8">
-              <Card className="hover:shadow-lg transition-shadow">
+            <div className="grid gap-8 md:grid-cols-3">
+              <Card className="transition-shadow hover:shadow-lg">
                 <CardContent className="pt-6">
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
                     <span className="text-2xl">📊</span>
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">1. Calculate</h3>
+                  <h3 className="mb-2 text-xl font-semibold">1. Calculate</h3>
                   <p className="text-muted-foreground">
                     Answer a few questions about your lifestyle. Our algorithm uses IPCC and EPA
                     emission factors to calculate your precise carbon footprint.
                   </p>
                 </CardContent>
               </Card>
-              <Card className="hover:shadow-lg transition-shadow">
+              <Card className="transition-shadow hover:shadow-lg">
                 <CardContent className="pt-6">
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
                     <span className="text-2xl">💡</span>
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">2. Analyze</h3>
+                  <h3 className="mb-2 text-xl font-semibold">2. Analyze</h3>
                   <p className="text-muted-foreground">
                     Get detailed breakdowns by category with personalized insights. See how you
                     compare to regional averages and identify your biggest impact areas.
                   </p>
                 </CardContent>
               </Card>
-              <Card className="hover:shadow-lg transition-shadow">
+              <Card className="transition-shadow hover:shadow-lg">
                 <CardContent className="pt-6">
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
                     <span className="text-2xl">⚡</span>
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">3. Act</h3>
+                  <h3 className="mb-2 text-xl font-semibold">3. Act</h3>
                   <p className="text-muted-foreground">
-                    Receive curated, quantified action recommendations. Track your progress and watch
-                    your carbon score improve over time.
+                    Receive curated, quantified action recommendations. Track your progress and
+                    watch your carbon score improve over time.
                   </p>
                 </CardContent>
               </Card>
@@ -130,25 +129,50 @@ export default function HomePage(): JSX.Element {
         {/* Categories Section */}
         <section className="py-20">
           <div className="container">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4">5 Dimensions of Your Footprint</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
+            <div className="mb-12 text-center">
+              <h2 className="mb-4 text-3xl font-bold">5 Dimensions of Your Footprint</h2>
+              <p className="mx-auto max-w-2xl text-muted-foreground">
                 We analyze every aspect of your lifestyle to give you the most accurate picture.
               </p>
             </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
               {[
-                { icon: '🚗', title: 'Transport', desc: 'Vehicles, flights, public transit', color: 'bg-green-50' },
-                { icon: '🍽️', title: 'Diet', desc: 'Food choices, waste, sourcing', color: 'bg-yellow-50' },
-                { icon: '⚡', title: 'Energy', desc: 'Home power, heating, cooling', color: 'bg-blue-50' },
-                { icon: '💻', title: 'Digital', desc: 'Screen time, streaming, devices', color: 'bg-purple-50' },
-                { icon: '🛍️', title: 'Consumption', desc: 'Shopping, recycling, services', color: 'bg-pink-50' },
+                {
+                  icon: '🚗',
+                  title: 'Transport',
+                  desc: 'Vehicles, flights, public transit',
+                  color: 'bg-green-50',
+                },
+                {
+                  icon: '🍽️',
+                  title: 'Diet',
+                  desc: 'Food choices, waste, sourcing',
+                  color: 'bg-yellow-50',
+                },
+                {
+                  icon: '⚡',
+                  title: 'Energy',
+                  desc: 'Home power, heating, cooling',
+                  color: 'bg-blue-50',
+                },
+                {
+                  icon: '💻',
+                  title: 'Digital',
+                  desc: 'Screen time, streaming, devices',
+                  color: 'bg-purple-50',
+                },
+                {
+                  icon: '🛍️',
+                  title: 'Consumption',
+                  desc: 'Shopping, recycling, services',
+                  color: 'bg-pink-50',
+                },
               ].map((item) => (
                 <Card key={item.title} className={item.color}>
                   <CardContent className="pt-6 text-center">
-                    <span className="text-3xl mb-2 block">{item.icon}</span>
+                    <span className="mb-2 block text-3xl">{item.icon}</span>
                     <h3 className="font-semibold">{item.title}</h3>
-                    <p className="text-sm text-muted-foreground mt-1">{item.desc}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">{item.desc}</p>
                   </CardContent>
                 </Card>
               ))}
@@ -157,15 +181,15 @@ export default function HomePage(): JSX.Element {
         </section>
 
         {/* CTA Section */}
-        <section className="py-20 bg-primary/5">
+        <section className="bg-primary/5 py-20">
           <div className="container text-center">
-            <h2 className="text-3xl font-bold mb-4">Ready to Take Action?</h2>
-            <p className="text-muted-foreground max-w-xl mx-auto mb-8">
+            <h2 className="mb-4 text-3xl font-bold">Ready to Take Action?</h2>
+            <p className="mx-auto mb-8 max-w-xl text-muted-foreground">
               Join thousands of users who are tracking their carbon footprint and making meaningful
               changes for the planet.
             </p>
             <Link href="/onboarding">
-              <Button size="lg" className="text-lg px-8">
+              <Button size="lg" className="px-8 text-lg">
                 Start Your Journey
               </Button>
             </Link>
@@ -173,5 +197,5 @@ export default function HomePage(): JSX.Element {
         </section>
       </main>
     </>
-  );
+  )
 }

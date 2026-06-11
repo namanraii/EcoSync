@@ -33,10 +33,18 @@ export const CarbonScoreGauge = React.memo(function CarbonScoreGauge({
   const offset = circumference - (score / 100) * circumference
 
   const getColor = (): string => {
-    if (score >= 80) {return '#10b981'}
-    if (score >= 60) {return '#34d399'}
-    if (score >= 40) {return '#f59e0b'}
-    if (score >= 20) {return '#f97316'}
+    if (score >= 80) {
+      return '#10b981'
+    }
+    if (score >= 60) {
+      return '#34d399'
+    }
+    if (score >= 40) {
+      return '#f59e0b'
+    }
+    if (score >= 20) {
+      return '#f97316'
+    }
     return '#ef4444'
   }
 
@@ -57,12 +65,7 @@ export const CarbonScoreGauge = React.memo(function CarbonScoreGauge({
         Your carbon score is {score} out of 100. Rating: {rating.label}. {rating.description}
       </span>
 
-      <svg
-        width={width}
-        height={width}
-        viewBox={`0 0 ${width} ${width}`}
-        aria-hidden="true"
-      >
+      <svg width={width} height={width} viewBox={`0 0 ${width} ${width}`} aria-hidden="true">
         {/* Background circle */}
         <circle
           cx={width / 2}

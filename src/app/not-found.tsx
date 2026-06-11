@@ -3,23 +3,21 @@
  * Accessible error page with navigation options
  */
 
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Search } from 'lucide-react';
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Search } from 'lucide-react'
 
 export default function NotFound(): JSX.Element {
   return (
-    <div className="flex items-center justify-center min-h-[50vh] p-4">
-      <Card className="max-w-md w-full text-center">
+    <div className="flex min-h-[50vh] items-center justify-center p-4">
+      <Card className="w-full max-w-md text-center">
         <CardHeader>
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
             <Search className="h-8 w-8 text-muted-foreground" aria-hidden="true" />
           </div>
           <CardTitle className="text-4xl">404</CardTitle>
-          <CardDescription className="text-lg">
-            Page not found
-          </CardDescription>
+          <CardDescription className="text-lg">Page not found</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-muted-foreground">
@@ -38,5 +36,5 @@ export default function NotFound(): JSX.Element {
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

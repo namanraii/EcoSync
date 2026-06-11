@@ -3,11 +3,11 @@
  * Status indicators and labels
  */
 
-import * as React from 'react';
-import { cn } from '@/lib/utils/helpers';
+import * as React from 'react'
+import { cn } from '@/lib/utils/helpers'
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'secondary' | 'destructive' | 'outline' | 'success' | 'warning';
+  variant?: 'default' | 'secondary' | 'destructive' | 'outline' | 'success' | 'warning'
 }
 
 function Badge({ className, variant = 'default', ...props }: BadgeProps): JSX.Element {
@@ -18,7 +18,7 @@ function Badge({ className, variant = 'default', ...props }: BadgeProps): JSX.El
     outline: 'text-foreground border border-input hover:bg-accent',
     success: 'bg-green-100 text-green-800 hover:bg-green-200',
     warning: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200',
-  };
+  }
 
   return (
     <div
@@ -29,7 +29,7 @@ function Badge({ className, variant = 'default', ...props }: BadgeProps): JSX.El
       )}
       {...props}
     />
-  );
+  )
 }
 
-export { Badge };
+export { Badge }

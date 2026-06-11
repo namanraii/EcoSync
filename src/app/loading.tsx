@@ -21,11 +21,7 @@ export default function Loading(): JSX.Element {
         {/* Stats grid skeleton */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {[1, 2, 3, 4].map((i) => (
-            <div
-              key={i}
-              className="rounded-lg border bg-card p-6"
-              aria-hidden="true"
-            >
+            <div key={i} className="rounded-lg border bg-card p-6" aria-hidden="true">
               <div className="h-4 w-20 animate-pulse rounded-md bg-muted" />
               <div className="mt-4 h-8 w-24 animate-pulse rounded-md bg-muted" />
             </div>

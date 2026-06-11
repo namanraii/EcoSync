@@ -2,8 +2,6 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { useStore } from '@/lib/hooks/use-store'
 import type { OnboardingData, UserProfile, Insight } from '@/types'
 
-
-
 describe('Zustand Store Integration', () => {
   beforeEach(() => {
     // Reset store to initial state before each test
@@ -224,7 +222,7 @@ describe('Zustand Store Integration', () => {
       useStore.getState().commitAction('action-1')
       useStore.getState().commitAction('action-1')
       // Should only appear once
-      expect(useStore.getState().committedActions.filter(id => id === 'action-1').length).toBe(1)
+      expect(useStore.getState().committedActions.filter((id) => id === 'action-1').length).toBe(1)
     })
   })
 

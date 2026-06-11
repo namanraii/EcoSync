@@ -55,10 +55,7 @@ function ChartSkeleton({ height, label }: { height: number; label: string }): JS
   return (
     <Card role="status" aria-label={label}>
       <CardContent className="p-6">
-        <div
-          className="animate-pulse rounded-md bg-muted"
-          style={{ height: `${height}px` }}
-        />
+        <div className="animate-pulse rounded-md bg-muted" style={{ height: `${height}px` }} />
         <p className="sr-only mt-2 text-sm text-muted-foreground">{label}</p>
       </CardContent>
     </Card>
@@ -72,7 +69,6 @@ const CATEGORY_ICONS: Record<EmissionCategory, React.ReactNode> = {
   digital: <Monitor className="h-4 w-4" aria-hidden="true" />,
   consumption: <ShoppingBag className="h-4 w-4" aria-hidden="true" />,
 }
-
 
 export default function DashboardPage(): JSX.Element {
   const router = useRouter()
@@ -116,13 +112,8 @@ export default function DashboardPage(): JSX.Element {
 
   const rating = getCarbonRating(carbonProfile.overallScore)
   const categories = carbonProfile.categoryBreakdown
-  const committedActionObjects = CARBON_ACTIONS.filter((a) =>
-    committedActions.includes(a.id)
-  )
-  const totalSavings = committedActionObjects.reduce(
-    (sum, a) => sum + a.impactScore,
-    0
-  )
+  const committedActionObjects = CARBON_ACTIONS.filter((a) => committedActions.includes(a.id))
+  const totalSavings = committedActionObjects.reduce((sum, a) => sum + a.impactScore, 0)
 
   // Get top 3 recommendations based on highest emission categories
   const sortedCategories = Object.entries(categories).sort(
@@ -163,8 +154,8 @@ export default function DashboardPage(): JSX.Element {
             carbonProfile.overallScore >= 60
               ? 'border-green-200 bg-green-50/50'
               : carbonProfile.overallScore >= 40
-              ? 'border-yellow-200 bg-yellow-50/50'
-              : 'border-red-200 bg-red-50/50'
+                ? 'border-yellow-200 bg-yellow-50/50'
+                : 'border-red-200 bg-red-50/50'
           }
         >
           <CardHeader>
@@ -172,15 +163,13 @@ export default function DashboardPage(): JSX.Element {
               Your Carbon Score: {carbonProfile.overallScore}/100
             </CardTitle>
             <CardDescription>
-              <span className={rating.color}>{rating.label}</span>.{' '}
-              {rating.description} You emit{' '}
-              <strong>{formatCarbonValue(carbonProfile.totalAnnualKgCO2)}</strong> CO₂e
-              annually.
+              <span className={rating.color}>{rating.label}</span>. {rating.description} You emit{' '}
+              <strong>{formatCarbonValue(carbonProfile.totalAnnualKgCO2)}</strong> CO₂e annually.
               {carbonProfile.percentile !== undefined && (
                 <>
                   {' '}
-                  You are doing better than{' '}
-                  <strong>{carbonProfile.percentile}%</strong> of people in your region.
+                  You are doing better than <strong>{carbonProfile.percentile}%</strong> of people
+                  in your region.
                 </>
               )}
             </CardDescription>
@@ -192,20 +181,13 @@ export default function DashboardPage(): JSX.Element {
       <div className="mb-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {/* Score Gauge */}
         <Suspense fallback={<ChartSkeleton height={200} label="Loading score gauge..." />}>
-          <ChartErrorBoundary
-            fallbackTitle="Score Gauge"
-            ariaLabel="Carbon score visualization"
-          >
+          <ChartErrorBoundary fallbackTitle="Score Gauge" ariaLabel="Carbon score visualization">
             <Card role="region" aria-label="Carbon score gauge">
               <CardHeader>
                 <CardTitle>Score</CardTitle>
               </CardHeader>
               <CardContent className="flex justify-center">
-                <CarbonScoreGauge
-                  score={carbonProfile.overallScore}
-                  size="md"
-                  showLabel={true}
-                />
+                <CarbonScoreGauge score={carbonProfile.overallScore} size="md" showLabel={true} />
               </CardContent>
             </Card>
           </ChartErrorBoundary>
@@ -279,10 +261,7 @@ export default function DashboardPage(): JSX.Element {
       </div>
 
       {/* Category Details */}
-      <section
-        aria-label="Category details"
-        className="mb-8"
-      >
+      <section aria-label="Category details" className="mb-8">
         <h2 className="mb-4 text-xl font-semibold">Category Breakdown</h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {Object.entries(categories).map(([key, category]) => {
@@ -307,8 +286,8 @@ export default function DashboardPage(): JSX.Element {
                       category.annualKgCO2 > 2000
                         ? 'destructive'
                         : category.annualKgCO2 > 1000
-                        ? 'warning'
-                        : 'success'
+                          ? 'warning'
+                          : 'success'
                     }
                     className="mb-2"
                   >
@@ -337,26 +316,18 @@ export default function DashboardPage(): JSX.Element {
       {/* Trend Chart */}
       {trends.length > 1 && (
         <Suspense fallback={<ChartSkeleton height={300} label="Loading trend chart..." />}>
-          <ChartErrorBoundary
-            fallbackTitle="Trend Analysis"
-            ariaLabel="Carbon trend over time"
-          >
-            <CarbonTrendChart
-              data={trends}
-              ariaLabel="Carbon emission trends over time"
-            />
+          <ChartErrorBoundary fallbackTitle="Trend Analysis" ariaLabel="Carbon trend over time">
+            <CarbonTrendChart data={trends} ariaLabel="Carbon emission trends over time" />
           </ChartErrorBoundary>
         </Suspense>
       )}
 
       {/* Recommended Actions */}
-      <section
-        aria-label="Recommended actions"
-        className="mb-8"
-      >
+      <section aria-label="Recommended actions" className="mb-8">
         <h2 className="mb-4 text-xl font-semibold">Recommended Actions</h2>
         <p className="mb-4 text-sm text-muted-foreground">
-          Based on your highest impact areas: {topCategories.map((c) => c.charAt(0).toUpperCase() + c.slice(1)).join(', ')}
+          Based on your highest impact areas:{' '}
+          {topCategories.map((c) => c.charAt(0).toUpperCase() + c.slice(1)).join(', ')}
         </p>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {recommendations.map((action) => (
@@ -376,9 +347,7 @@ export default function DashboardPage(): JSX.Element {
                 <p className="text-sm text-muted-foreground">{action.description}</p>
                 <div className="mt-3 flex items-center gap-2 text-sm">
                   <Leaf className="h-4 w-4 text-green-500" aria-hidden="true" />
-                  <span>
-                    Save {formatCarbonValue(action.impactScore)} CO₂e/year
-                  </span>
+                  <span>Save {formatCarbonValue(action.impactScore)} CO₂e/year</span>
                 </div>
                 <p className="mt-1 text-xs text-muted-foreground">
                   {action.estimatedCost} cost • {action.timeToImplement}
