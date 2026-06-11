@@ -3,6 +3,8 @@
 > **Hack2Skill PromptWars Challenge 3** | Carbon Footprint Awareness Platform
 > Helping individuals understand, track, and reduce their carbon footprint through simple actions and personalized insights.
 
+🚀 **Live Demo:** [https://eco-sync-opal.vercel.app/](https://eco-sync-opal.vercel.app/)
+
 [![CI/CD](https://github.com/yourusername/ecosync/actions/workflows/ci.yml/badge.svg)](https://github.com/yourusername/ecosync/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.4-blue.svg)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-14.2-black.svg)](https://nextjs.org/)
