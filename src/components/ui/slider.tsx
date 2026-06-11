@@ -38,7 +38,8 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
     },
     ref
   ) => {
-    const sliderId = id || React.useId();
+    const defaultId = React.useId();
+    const sliderId = id || defaultId;
     const errorId = `${sliderId}-error`;
     const helperId = `${sliderId}-helper`;
     const percentage = ((value - min) / (max - min)) * 100;

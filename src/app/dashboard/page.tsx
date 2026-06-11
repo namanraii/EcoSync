@@ -78,7 +78,7 @@ export default function DashboardPage(): JSX.Element {
   const router = useRouter()
   const carbonProfile = useCarbonProfile()
   const committedActions = useCommittedActions()
-  const { trends } = useStore()
+  const { trends, commitAction } = useStore()
   const [previousScore, setPreviousScore] = React.useState<number | undefined>(undefined)
 
   // Track score changes for aria-live announcements
@@ -91,7 +91,7 @@ export default function DashboardPage(): JSX.Element {
         return carbonProfile.overallScore
       })
     }
-  }, [carbonProfile?.overallScore])
+  }, [carbonProfile])
 
   if (!carbonProfile) {
     return (
@@ -153,7 +153,6 @@ export default function DashboardPage(): JSX.Element {
 
       {/* Score Alert with aria-live */}
       <section
-        role="region"
         aria-label="Carbon score summary"
         aria-live="polite"
         aria-atomic="true"
@@ -281,7 +280,6 @@ export default function DashboardPage(): JSX.Element {
 
       {/* Category Details */}
       <section
-        role="region"
         aria-label="Category details"
         className="mb-8"
       >
@@ -353,7 +351,6 @@ export default function DashboardPage(): JSX.Element {
 
       {/* Recommended Actions */}
       <section
-        role="region"
         aria-label="Recommended actions"
         className="mb-8"
       >
@@ -390,7 +387,7 @@ export default function DashboardPage(): JSX.Element {
                   className="mt-4 w-full"
                   variant="outline"
                   onClick={() => {
-                    useStore.getState().commitAction(action.id)
+                    commitAction(action.id)
                   }}
                   aria-label={`Commit to action: ${action.title}`}
                 >

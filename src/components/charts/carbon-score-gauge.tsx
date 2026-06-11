@@ -33,10 +33,10 @@ export const CarbonScoreGauge = React.memo(function CarbonScoreGauge({
   const offset = circumference - (score / 100) * circumference
 
   const getColor = (): string => {
-    if (score >= 80) return '#10b981'
-    if (score >= 60) return '#34d399'
-    if (score >= 40) return '#f59e0b'
-    if (score >= 20) return '#f97316'
+    if (score >= 80) {return '#10b981'}
+    if (score >= 60) {return '#34d399'}
+    if (score >= 40) {return '#f59e0b'}
+    if (score >= 20) {return '#f97316'}
     return '#ef4444'
   }
 
@@ -45,7 +45,7 @@ export const CarbonScoreGauge = React.memo(function CarbonScoreGauge({
   return (
     <div
       className={cn('flex flex-col items-center', className)}
-      role="img"
+      role="meter"
       aria-label={ariaLabel}
       aria-valuenow={score}
       aria-valuemin={0}

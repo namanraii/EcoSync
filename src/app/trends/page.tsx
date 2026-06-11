@@ -6,6 +6,7 @@
 'use client';
 
 import * as React from 'react';
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CarbonTrendChart } from '@/components/charts/carbon-trend-chart';
@@ -20,21 +21,21 @@ export default function TrendsPage(): JSX.Element {
 
   if (!carbonProfile) {
     return (
-      <main className="flex-1 flex flex-col items-center justify-center py-20 text-center">
-        <Card className="max-w-md mx-auto">
-          <CardHeader>
-            <CardTitle>No Profile Found</CardTitle>
-            <CardDescription>Complete the onboarding to see your trends.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <a href="/onboarding">
-              <button className="w-full bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90">
+      <>
+        <main className="flex-1 flex flex-col items-center justify-center py-20 text-center">
+          <Card className="max-w-md mx-auto">
+            <CardHeader>
+              <CardTitle>No Profile Found</CardTitle>
+              <CardDescription>Complete the onboarding to see your trends.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link href="/onboarding" className="block w-full bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90">
                 Start Onboarding
-              </button>
-            </a>
-          </CardContent>
-        </Card>
-      </main>
+              </Link>
+            </CardContent>
+          </Card>
+        </main>
+      </>
     );
   }
 
@@ -50,7 +51,7 @@ export default function TrendsPage(): JSX.Element {
     : [
         ...trends,
         {
-          date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+          date: new Date(new Date(carbonProfile.lastUpdated).getTime() - 30 * 24 * 60 * 60 * 1000).toISOString(),
           totalCarbon: currentTotal * 1.1,
           categoryBreakdown: {
             transport: carbonProfile.categoryBreakdown.transport.annualKgCO2 * 1.1,

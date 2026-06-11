@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { useRouter } from 'next/navigation'
 import { AlertTriangle, RotateCcw, Home } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -11,6 +12,7 @@ interface ErrorProps {
 }
 
 export default function ErrorBoundary({ error, reset }: ErrorProps): JSX.Element {
+  const router = useRouter()
   const [errorDetails, setErrorDetails] = React.useState(false)
 
   React.useEffect(() => {
@@ -59,7 +61,7 @@ export default function ErrorBoundary({ error, reset }: ErrorProps): JSX.Element
               </Button>
               <Button
                 variant="outline"
-                onClick={() => window.location.href = '/'}
+                onClick={() => router.push('/')}
                 className="flex-1"
                 aria-label="Return to home page"
               >

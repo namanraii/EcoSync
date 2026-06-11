@@ -16,6 +16,9 @@ import {
   REGIONAL_AVERAGES,
   CARBON_SCORE_TARGETS,
 } from '@/lib/data/emission-factors';
+import { CARBON_ACTIONS } from '@/lib/data/carbon-actions';
+
+const DAYS_IN_YEAR = 365;
 
 // ==================== COLOR PALETTE FOR BREAKDOWN ====================
 const CATEGORY_COLORS: Record<EmissionCategory, string[]> = {
@@ -155,7 +158,7 @@ export function calculateDietEmissions(data: OnboardingData['diet']): CarbonResu
     category: 'diet',
     subcategory: data.dietType,
     annualKgCO2: totalAnnual,
-    dailyKgCO2: totalAnnual / 365,
+    dailyKgCO2: totalAnnual / DAYS_IN_YEAR,
     breakdown,
     confidence: 0.8,
   };
@@ -241,7 +244,7 @@ export function calculateEnergyEmissions(data: OnboardingData['energy']): Carbon
     category: 'energy',
     subcategory: data.heatingType,
     annualKgCO2: totalAnnual,
-    dailyKgCO2: totalAnnual / 365,
+    dailyKgCO2: totalAnnual / DAYS_IN_YEAR,
     breakdown,
     confidence: 0.7,
   };
@@ -306,7 +309,7 @@ export function calculateDigitalEmissions(data: OnboardingData['digital']): Carb
     category: 'digital',
     subcategory: 'digital_lifestyle',
     annualKgCO2: totalAnnual,
-    dailyKgCO2: totalAnnual / 365,
+    dailyKgCO2: totalAnnual / DAYS_IN_YEAR,
     breakdown,
     confidence: 0.6,
   };
@@ -379,7 +382,7 @@ export function calculateConsumptionEmissions(data: OnboardingData['consumption'
     category: 'consumption',
     subcategory: data.clothingFrequency,
     annualKgCO2: totalAnnual,
-    dailyKgCO2: totalAnnual / 365,
+    dailyKgCO2: totalAnnual / DAYS_IN_YEAR,
     breakdown,
     confidence: 0.65,
   };
@@ -416,7 +419,7 @@ export function buildCarbonProfile(
 
   return {
     totalAnnualKgCO2: Math.round(totalAnnual * 100) / 100,
-    totalDailyKgCO2: Math.round((totalAnnual / 365) * 100) / 100,
+    totalDailyKgCO2: Math.round((totalAnnual / DAYS_IN_YEAR) * 100) / 100,
     categoryBreakdown: {
       transport,
       diet,
@@ -438,8 +441,8 @@ export function buildCarbonProfile(
 export function calculateCarbonScore(annualKgCO2: number): number {
   const { excellent, poor } = CARBON_SCORE_TARGETS;
 
-  if (annualKgCO2 <= excellent) return 100;
-  if (annualKgCO2 >= poor) return 0;
+  if (annualKgCO2 <= excellent) {return 100;}
+  if (annualKgCO2 >= poor) {return 0;}
 
   // Linear interpolation between excellent and poor
   const score = 100 - ((annualKgCO2 - excellent) / (poor - excellent)) * 100;
@@ -503,18 +506,19 @@ export function formatCarbonValue(kgCO2: number): string {
  * Convert daily to annual and vice versa
  */
 export function convertToAnnual(daily: number): number {
-  return daily * 365;
+  return daily * DAYS_IN_YEAR;
 }
 
 export function convertToDaily(annual: number): number {
-  return annual / 365;
+  return annual / DAYS_IN_YEAR;
 }
 
 /**
  * Calculate potential savings from committed actions
  */
 export function calculateCommittedSavings(actionIds: string[]): number {
-  // This will be implemented with the actions database
-  // Placeholder for now
-  return actionIds.length * 200; // Rough estimate
+  return actionIds.reduce((total, id) => {
+    const action = CARBON_ACTIONS.find((a) => a.id === id);
+    return total + (action ? action.impactScore : 0);
+  }, 0);
 }

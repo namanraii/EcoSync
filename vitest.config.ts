@@ -27,7 +27,7 @@ export default defineConfig({
       ],
     },
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
-    exclude: ['node_modules/', 'dist/', '.next/'],
+    exclude: ['node_modules/', 'dist/', '.next/', 'src/__tests__/e2e/**'],
   },
   resolve: {
     alias: {

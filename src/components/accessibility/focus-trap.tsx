@@ -33,7 +33,7 @@ export function FocusTrap({
       } else {
         const focusable = getFocusableElements(containerRef.current)
         const firstEl = focusable[0]
-        if (firstEl != null) {
+        if (firstEl !== undefined && firstEl !== null) {
           firstEl.focus()
         }
       }
@@ -46,12 +46,12 @@ export function FocusTrap({
 
   // Handle Tab key to trap focus
   React.useEffect(() => {
-    if (!isActive) return
+    if (!isActive) {return}
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Tab') {
         const focusable = getFocusableElements(containerRef.current)
-        if (focusable.length === 0) return
+        if (focusable.length === 0) {return}
 
         const first = focusable[0]
         const last = focusable[focusable.length - 1]
@@ -59,12 +59,12 @@ export function FocusTrap({
         if (e.shiftKey) {
           if (document.activeElement === first) {
             e.preventDefault()
-            if (last != null) last.focus()
+            if (last !== undefined && last !== null) {last.focus()}
           }
         } else {
           if (document.activeElement === last) {
             e.preventDefault()
-            if (first != null) first.focus()
+            if (first !== undefined && first !== null) {first.focus()}
           }
         }
       }
@@ -89,9 +89,10 @@ export function FocusTrap({
     }
   }, [isActive])
 
-  if (!isActive) return null
+  if (!isActive) {return null}
 
   return (
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events
     <div
       ref={containerRef}
       role="dialog"
@@ -112,7 +113,7 @@ export function FocusTrap({
 }
 
 function getFocusableElements(container: HTMLElement | null): HTMLElement[] {
-  if (!container) return []
+  if (!container) {return []}
 
   const selector = [
     'a[href]',

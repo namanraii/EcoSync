@@ -5,7 +5,7 @@
 
 🚀 **Live Demo:** [https://eco-sync-opal.vercel.app/](https://eco-sync-opal.vercel.app/)
 
-[![CI/CD](https://github.com/yourusername/ecosync/actions/workflows/ci.yml/badge.svg)](https://github.com/yourusername/ecosync/actions/workflows/ci.yml)
+[![CI/CD](https://github.com/namanraii/ecosync/actions/workflows/ci.yml/badge.svg)](https://github.com/namanraii/ecosync/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.4-blue.svg)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-14.2-black.svg)](https://nextjs.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38B2AC.svg)](https://tailwindcss.com/)
@@ -151,7 +151,7 @@ Visualization (Recharts) → Insights Generation → Action Recommendations
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/ecosync.git
+git clone https://github.com/namanraii/ecosync.git
 cd ecosync
 
 # Install dependencies

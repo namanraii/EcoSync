@@ -33,7 +33,7 @@ function checkRateLimit(state: RateLimitState): { allowed: boolean; warning: boo
 }
 
 function getStorageSize(): number {
-  if (!isClient()) return 0
+  if (!isClient()) {return 0}
   let total = 0
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i) || ''
@@ -62,10 +62,10 @@ export function useLocalStorage<T>(
 
   // Initialize state with value from localStorage or initialValue
   const [storedValue, setStoredValue] = useState<T>(() => {
-    if (!isClient()) return initialValue
+    if (!isClient()) {return initialValue}
     try {
       const item = window.localStorage.getItem(sanitizedKey)
-      if (!item) return initialValue
+      if (!item) {return initialValue}
 
       // Validate size before parsing
       if (item.length > 100000) {
@@ -151,7 +151,7 @@ export function useLocalStorage<T>(
 
   // Sync with other tabs/windows
   useEffect(() => {
-    if (!isClient()) return
+    if (!isClient()) {return}
 
     const handleStorageChange = (event: StorageEvent) => {
       if (event.key === sanitizedKey && event.newValue !== null) {
@@ -176,16 +176,8 @@ export function useLocalStorage<T>(
     return () => window.removeEventListener('storage', handleStorageChange)
   }, [sanitizedKey, initialValue])
 
-  // Cleanup old rate limit timestamps periodically
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const now = Date.now()
-      rateLimitRef.current.operations = rateLimitRef.current.operations.filter(
-        (t) => t > now - RATE_LIMIT.windowMs
-      )
-    }, RATE_LIMIT.windowMs)
-    return () => clearInterval(interval)
-  }, [])
+  // Operations array is pruned lazily during checkRateLimit and setValue
+
 
   return [storedValue, setValue, removeValue, { error, rateLimited }]
 }

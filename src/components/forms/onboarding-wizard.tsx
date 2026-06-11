@@ -51,6 +51,14 @@ export default function OnboardingWizard(): JSX.Element {
   const [errors, setErrors] = React.useState<string[]>([])
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [isComplete, setIsComplete] = React.useState(false)
+  const [announcement, setAnnouncement] = React.useState('')
+  const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  React.useEffect(() => {
+    return () => {
+      if (timerRef.current) {clearTimeout(timerRef.current)}
+    }
+  }, [])
 
   const { setOnboardingData, setUserProfile, calculateProfile, userProfile } = useStore()
 
@@ -107,11 +115,8 @@ export default function OnboardingWizard(): JSX.Element {
   const handleNext = (): void => {
     if (currentStep < STEPS.length - 1) {
       setCurrentStep((prev) => prev + 1)
-      const announcement = document.getElementById('step-announcement')
-      if (announcement) {
-        const nextStep = STEPS[currentStep + 1]
-        announcement.textContent = `Step ${currentStep + 2} of ${STEPS.length}: ${nextStep?.title ?? ''}`
-      }
+      const nextStep = STEPS[currentStep + 1]
+      setAnnouncement(`Step ${currentStep + 2} of ${STEPS.length}: ${nextStep?.title ?? ''}`)
     } else {
       handleSubmit()
     }
@@ -120,11 +125,8 @@ export default function OnboardingWizard(): JSX.Element {
   const handleBack = (): void => {
     if (currentStep > 0) {
       setCurrentStep((prev) => prev - 1)
-      const announcement = document.getElementById('step-announcement')
-      if (announcement) {
-        const prevStep = STEPS[currentStep - 1]
-        announcement.textContent = `Step ${currentStep} of ${STEPS.length}: ${prevStep?.title ?? ''}`
-      }
+      const prevStep = STEPS[currentStep - 1]
+      setAnnouncement(`Step ${currentStep} of ${STEPS.length}: ${prevStep?.title ?? ''}`)
     }
   }
 
@@ -157,7 +159,7 @@ export default function OnboardingWizard(): JSX.Element {
     calculateProfile()
     setIsComplete(true)
 
-    setTimeout(() => {
+    timerRef.current = setTimeout(() => {
       router.push('/dashboard')
     }, 500)
   }
@@ -211,7 +213,6 @@ export default function OnboardingWizard(): JSX.Element {
               type="number"
               min={0}
               max={5000}
-              maxLength={4}
               pattern="[0-9]*"
               autoComplete="off"
               value={formData.transport.weeklyDistanceKm}
@@ -242,7 +243,6 @@ export default function OnboardingWizard(): JSX.Element {
               type="number"
               min={0}
               max={100}
-              maxLength={3}
               pattern="[0-9]*"
               autoComplete="off"
               value={formData.transport.flightsPerYear}
@@ -279,7 +279,6 @@ export default function OnboardingWizard(): JSX.Element {
               type="number"
               min={0}
               max={100}
-              maxLength={3}
               pattern="[0-9]*"
               autoComplete="off"
               value={formData.diet.localFoodPercentage}
@@ -330,7 +329,6 @@ export default function OnboardingWizard(): JSX.Element {
               type="number"
               min={5}
               max={1000}
-              maxLength={4}
               pattern="[0-9]*"
               autoComplete="off"
               value={formData.energy.squareMeters}
@@ -344,7 +342,6 @@ export default function OnboardingWizard(): JSX.Element {
               type="number"
               min={1}
               max={20}
-              maxLength={2}
               pattern="[0-9]*"
               autoComplete="off"
               value={formData.energy.occupants}
@@ -358,7 +355,6 @@ export default function OnboardingWizard(): JSX.Element {
               type="number"
               min={0}
               max={100}
-              maxLength={3}
               pattern="[0-9]*"
               autoComplete="off"
               value={formData.energy.renewablePercentage}
@@ -411,7 +407,6 @@ export default function OnboardingWizard(): JSX.Element {
               type="number"
               min={0}
               max={24}
-              maxLength={2}
               pattern="[0-9]*"
               autoComplete="off"
               value={formData.digital.dailyScreenHours}
@@ -425,7 +420,6 @@ export default function OnboardingWizard(): JSX.Element {
               type="number"
               min={0}
               max={24}
-              maxLength={2}
               pattern="[0-9]*"
               autoComplete="off"
               value={formData.digital.streamingHours}
@@ -439,7 +433,6 @@ export default function OnboardingWizard(): JSX.Element {
               type="number"
               min={0}
               max={1000}
-              maxLength={4}
               pattern="[0-9]*"
               autoComplete="off"
               value={formData.digital.emailCount}
@@ -453,7 +446,6 @@ export default function OnboardingWizard(): JSX.Element {
               type="number"
               min={0}
               max={10000}
-              maxLength={5}
               pattern="[0-9]*"
               autoComplete="off"
               value={formData.digital.cloudStorageGB}
@@ -467,7 +459,6 @@ export default function OnboardingWizard(): JSX.Element {
               type="number"
               min={1}
               max={50}
-              maxLength={2}
               pattern="[0-9]*"
               autoComplete="off"
               value={formData.digital.deviceCount}
@@ -485,7 +476,6 @@ export default function OnboardingWizard(): JSX.Element {
               type="number"
               min={0}
               max={50000}
-              maxLength={6}
               pattern="[0-9]*"
               autoComplete="off"
               value={formData.consumption.monthlyShoppingBudget}
@@ -571,7 +561,7 @@ export default function OnboardingWizard(): JSX.Element {
         </CardHeader>
 
         <div id="step-announcement" aria-live="polite" aria-atomic="true" className="sr-only">
-          Step {currentStep + 1} of {STEPS.length}: {currentStepData?.title ?? ''}
+          {announcement || `Step ${currentStep + 1} of ${STEPS.length}: ${currentStepData?.title ?? ''}`}
         </div>
 
         {errors.length > 0 && (

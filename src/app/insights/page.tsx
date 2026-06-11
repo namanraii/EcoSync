@@ -6,7 +6,7 @@
 'use client';
 
 import * as React from 'react';
-
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
@@ -30,28 +30,12 @@ export default function InsightsPage(): JSX.Element {
   const carbonProfile = useCarbonProfile();
   const { committedActions } = useStore();
 
-  if (!carbonProfile) {
-    return (
-      <main className="flex-1 flex flex-col items-center justify-center py-20 text-center">
-        <Card className="max-w-md mx-auto">
-          <CardHeader>
-            <CardTitle>No Profile Found</CardTitle>
-            <CardDescription>Complete the onboarding to see personalized insights.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <a href="/onboarding">
-              <button className="w-full bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90">
-                Start Onboarding
-              </button>
-            </a>
-          </CardContent>
-        </Card>
-      </main>
-    );
-  }
-
   // Generate insights based on profile data
   const insights: InsightItem[] = React.useMemo(() => {
+    if (!carbonProfile) {
+      return [];
+    }
+
     const items: InsightItem[] = [];
     const categories = carbonProfile.categoryBreakdown;
 
@@ -156,6 +140,26 @@ export default function InsightsPage(): JSX.Element {
     return items;
   }, [carbonProfile, committedActions]);
 
+  if (!carbonProfile) {
+    return (
+      <>
+        <main className="flex-1 flex flex-col items-center justify-center py-20 text-center">
+          <Card className="max-w-md mx-auto">
+            <CardHeader>
+              <CardTitle>No Profile Found</CardTitle>
+              <CardDescription>Complete the onboarding to see personalized insights.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link href="/onboarding" className="block w-full bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90">
+                Start Onboarding
+              </Link>
+            </CardContent>
+          </Card>
+        </main>
+      </>
+    );
+  }
+
   const typeConfig = {
     warning: { icon: '⚠️', color: 'border-l-orange-500 bg-orange-50' },
     opportunity: { icon: '💡', color: 'border-l-blue-500 bg-blue-50' },
@@ -227,12 +231,12 @@ export default function InsightsPage(): JSX.Element {
                           </p>
                         )}
                         {insight.action && (
-                          <a
+                          <Link
                             href="/actions"
                             className="text-sm text-primary hover:underline mt-2 inline-block"
                           >
                             {insight.action} →
-                          </a>
+                          </Link>
                         )}
                       </div>
                     </div>

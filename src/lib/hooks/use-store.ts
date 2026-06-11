@@ -59,6 +59,8 @@ const initialState = {
   toast: null,
 }
 
+let toastTimeoutId: ReturnType<typeof setTimeout> | null = null
+
 export const useStore = create<AppState>()(
   persist(
     (set, get) => ({
@@ -68,7 +70,7 @@ export const useStore = create<AppState>()(
 
       updateUserProfile: (updates) => {
         const current = get().userProfile
-        if (!current) return
+        if (!current) {return}
         set({
           userProfile: { ...current, ...updates, updatedAt: new Date().toISOString() },
         })
@@ -90,7 +92,7 @@ export const useStore = create<AppState>()(
 
       calculateProfile: () => {
         const { onboardingData, userProfile } = get()
-        if (!onboardingData || !userProfile) return
+        if (!onboardingData || !userProfile) {return}
 
         const profile = buildCarbonProfile(onboardingData, userProfile.region)
 
@@ -160,15 +162,29 @@ export const useStore = create<AppState>()(
       setActiveTab: (tab) => set({ activeTab: tab }),
 
       showToast: (message, type) => {
+        if (toastTimeoutId) {clearTimeout(toastTimeoutId)}
         set({ toast: { message, type } })
-        setTimeout(() => {
+        toastTimeoutId = setTimeout(() => {
           set({ toast: null })
+          toastTimeoutId = null
         }, 5000)
       },
 
-      clearToast: () => set({ toast: null }),
+      clearToast: () => {
+        if (toastTimeoutId) {
+          clearTimeout(toastTimeoutId)
+          toastTimeoutId = null
+        }
+        set({ toast: null })
+      },
 
-      resetStore: () => set(initialState),
+      resetStore: () => {
+        if (toastTimeoutId) {
+          clearTimeout(toastTimeoutId)
+          toastTimeoutId = null
+        }
+        set(initialState)
+      },
     }),
     {
       name: 'ecosync-storage',

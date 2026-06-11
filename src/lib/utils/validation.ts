@@ -122,9 +122,7 @@ export function validateUserInput(data: unknown): {
   const result = UserInputSchema.safeParse(data);
 
   if (result.success) {
-    const { metadata, ...rest } = result.data
-    const userInput: UserInput = metadata !== undefined ? { ...rest, metadata } : rest
-    return { success: true, data: userInput };
+    return { success: true, data: result.data as UserInput };
   }
 
   return {
@@ -179,8 +177,8 @@ export function validateRange(
   max: number,
   fieldName: string
 ): string | null {
-  if (value < min) return `${fieldName} must be at least ${min}`;
-  if (value > max) return `${fieldName} must be at most ${max}`;
+  if (value < min) {return `${fieldName} must be at least ${min}`;}
+  if (value > max) {return `${fieldName} must be at most ${max}`;}
   return null;
 }
 
@@ -193,8 +191,8 @@ export function validateArrayLength<T>(
   max: number,
   fieldName: string
 ): string | null {
-  if (array.length < min) return `${fieldName} must have at least ${min} items`;
-  if (array.length > max) return `${fieldName} must have at most ${max} items`;
+  if (array.length < min) {return `${fieldName} must have at least ${min} items`;}
+  if (array.length > max) {return `${fieldName} must have at most ${max} items`;}
   return null;
 }
 

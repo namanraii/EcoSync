@@ -20,11 +20,12 @@ interface CarbonDonutChartProps {
 }
 
 // Memoized active shape for performance
-const renderActiveShape = (props: any): JSX.Element => {
+const renderActiveShape = (props: unknown): JSX.Element => {
   const {
     cx, cy, innerRadius, outerRadius, startAngle, endAngle,
     fill, payload, percent
-  } = props
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } = props as Record<string, any>
 
   return (
     <g>
@@ -67,7 +68,7 @@ export const CarbonDonutChart = React.memo(function CarbonDonutChart({
   const chartId = React.useId()
 
   const onPieEnter = React.useCallback(
-    (_: any, index: number) => {
+    (_: unknown, index: number) => {
       setActiveIndex(index)
     },
     []

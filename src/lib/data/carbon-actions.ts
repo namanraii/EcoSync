@@ -653,7 +653,7 @@ export function getRecommendedActions(
       .sort((a, b) => b.impactScore - a.impactScore);
 
     recommendations.push(...categoryActions);
-    if (recommendations.length >= limit) break;
+    if (recommendations.length >= limit) {break;}
   }
 
   return recommendations.slice(0, limit);

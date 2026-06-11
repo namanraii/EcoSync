@@ -7,7 +7,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils/helpers';
 import { useStore, useUserProfile } from '@/lib/hooks/use-store';
 
@@ -20,6 +20,7 @@ const NAV_ITEMS = [
 
 export function Navbar(): JSX.Element {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const userProfile = useUserProfile();
   const { resetStore } = useStore();
@@ -27,7 +28,7 @@ export function Navbar(): JSX.Element {
   const handleReset = (): void => {
     if (typeof window !== 'undefined' && window.confirm('Are you sure you want to reset all data?')) {
       resetStore();
-      window.location.href = '/';
+      router.push('/');
     }
   };
 

@@ -70,11 +70,11 @@ export function Toast({ message, type = 'info', onClose, duration = 5000 }: Toas
   };
 
   return (
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <div
       role="status"
       aria-live="polite"
       aria-atomic="true"
-      tabIndex={0}
       onKeyDown={handleKeyDown}
       className={cn(
         'fixed bottom-4 right-4 z-50 flex items-center gap-3 rounded-lg border p-4 shadow-lg transition-all duration-300 max-w-sm',

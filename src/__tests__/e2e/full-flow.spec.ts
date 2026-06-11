@@ -275,7 +275,7 @@ test.describe('EcoSync Full Application Flow', () => {
       // Check that focus styles are applied
       const styles = await page.evaluate(() => {
         const el = document.activeElement
-        if (!el) return null
+        if (!el) {return null}
         const computed = window.getComputedStyle(el)
         return {
           outline: computed.outline,

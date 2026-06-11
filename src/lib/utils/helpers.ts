@@ -52,11 +52,11 @@ export function formatRelativeTime(date: string | Date): string {
   const diffMs = now.getTime() - d.getTime();
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-  if (diffDays === 0) return 'Today';
-  if (diffDays === 1) return 'Yesterday';
-  if (diffDays < 7) return `${diffDays} days ago`;
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-  if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
+  if (diffDays === 0) {return 'Today';}
+  if (diffDays === 1) {return 'Yesterday';}
+  if (diffDays < 7) {return `${diffDays} days ago`;}
+  if (diffDays < 30) {return `${Math.floor(diffDays / 7)} weeks ago`;}
+  if (diffDays < 365) {return `${Math.floor(diffDays / 30)} months ago`;}
   return `${Math.floor(diffDays / 365)} years ago`;
 }
 
@@ -64,13 +64,16 @@ export function formatRelativeTime(date: string | Date): string {
  * Generate a unique ID
  */
 export function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  return `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
 }
 
 /**
  * Deep clone an object
  */
 export function deepClone<T>(obj: T): T {
+  if (typeof structuredClone === 'function') {
+    return structuredClone(obj);
+  }
   return JSON.parse(JSON.stringify(obj));
 }
 
@@ -81,7 +84,7 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout;
+  let timeout: ReturnType<typeof setTimeout>;
 
   return (...args: Parameters<T>) => {
     clearTimeout(timeout);
@@ -121,7 +124,7 @@ export function isClient(): boolean {
  */
 export const storage = {
   get: <T>(key: string, defaultValue: T): T => {
-    if (!isClient()) return defaultValue;
+    if (!isClient()) {return defaultValue;}
     try {
       const item = localStorage.getItem(key);
       return item ? (JSON.parse(item) as T) : defaultValue;
@@ -131,7 +134,7 @@ export const storage = {
   },
 
   set: <T>(key: string, value: T): void => {
-    if (!isClient()) return;
+    if (!isClient()) {return;}
     try {
       localStorage.setItem(key, JSON.stringify(value));
     } catch {
@@ -140,7 +143,7 @@ export const storage = {
   },
 
   remove: (key: string): void => {
-    if (!isClient()) return;
+    if (!isClient()) {return;}
     try {
       localStorage.removeItem(key);
     } catch {
@@ -149,7 +152,7 @@ export const storage = {
   },
 
   clear: (): void => {
-    if (!isClient()) return;
+    if (!isClient()) {return;}
     try {
       localStorage.clear();
     } catch {
@@ -162,7 +165,7 @@ export const storage = {
  * Sanitize user input to prevent XSS
  */
 export function sanitizeInput(input: string): string {
-  if (!input) return '';
+  if (!input) {return '';}
   return input
     .replace(/[<>]/g, '')
     .replace(/javascript:/gi, '')
@@ -197,7 +200,7 @@ export function roundTo(value: number, decimals: number): number {
  * Calculate percentage change
  */
 export function calculatePercentageChange(current: number, previous: number): number {
-  if (previous === 0) return current > 0 ? 100 : 0;
+  if (previous === 0) {return current > 0 ? 100 : 0;}
   return roundTo(((current - previous) / previous) * 100, 1);
 }
 
@@ -220,8 +223,8 @@ export function sortBy<T>(array: T[], key: keyof T, direction: 'asc' | 'desc' = 
   return [...array].sort((a, b) => {
     const aVal = a[key];
     const bVal = b[key];
-    if (aVal < bVal) return direction === 'asc' ? -1 : 1;
-    if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+    if (aVal < bVal) {return direction === 'asc' ? -1 : 1;}
+    if (aVal > bVal) {return direction === 'asc' ? 1 : -1;}
     return 0;
   });
 }
@@ -270,7 +273,7 @@ export function hexToRgba(hex: string, alpha: number = 1): string {
  * Scroll to element smoothly
  */
 export function scrollToElement(elementId: string, offset: number = 80): void {
-  if (!isClient()) return;
+  if (!isClient()) {return;}
   const element = document.getElementById(elementId);
   if (element) {
     const top = element.getBoundingClientRect().top + window.scrollY - offset;
@@ -282,7 +285,7 @@ export function scrollToElement(elementId: string, offset: number = 80): void {
  * Copy text to clipboard
  */
 export async function copyToClipboard(text: string): Promise<boolean> {
-  if (!isClient()) return false;
+  if (!isClient()) {return false;}
   try {
     await navigator.clipboard.writeText(text);
     return true;
@@ -295,7 +298,7 @@ export async function copyToClipboard(text: string): Promise<boolean> {
  * Detect preferred color scheme
  */
 export function getPreferredColorScheme(): 'light' | 'dark' {
-  if (!isClient()) return 'light';
+  if (!isClient()) {return 'light';}
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
@@ -303,7 +306,7 @@ export function getPreferredColorScheme(): 'light' | 'dark' {
  * Check if user prefers reduced motion
  */
 export function prefersReducedMotion(): boolean {
-  if (!isClient()) return false;
+  if (!isClient()) {return false;}
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
