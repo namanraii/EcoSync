@@ -6,8 +6,7 @@
 'use client';
 
 import * as React from 'react';
-import { Navbar } from '@/components/layout/navbar';
-import { Footer } from '@/components/layout/footer';
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
@@ -34,8 +33,7 @@ export default function InsightsPage(): JSX.Element {
   if (!carbonProfile) {
     return (
       <>
-        <Navbar />
-        <main className="flex-1 flex items-center justify-center">
+        <main className="flex-1 flex flex-col items-center justify-center py-20 text-center">
           <Card className="max-w-md mx-auto">
             <CardHeader>
               <CardTitle>No Profile Found</CardTitle>
@@ -176,8 +174,7 @@ export default function InsightsPage(): JSX.Element {
 
   return (
     <>
-      <Navbar />
-      <main className="flex-1 py-8">
+      <main className="flex-1 py-12">
         <div className="container">
           {/* Header */}
           <div className="mb-8">
@@ -259,7 +256,6 @@ export default function InsightsPage(): JSX.Element {
           )}
         </div>
       </main>
-      <Footer />
     </>
   );
 }

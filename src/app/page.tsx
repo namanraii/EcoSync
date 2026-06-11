@@ -6,17 +6,14 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Navbar } from '@/components/layout/navbar';
-import { Footer } from '@/components/layout/footer';
 import { CarbonScoreGauge } from '@/components/charts/carbon-score-gauge';
 
 export default function HomePage(): JSX.Element {
   return (
     <>
-      <Navbar />
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative overflow-hidden py-20 lg:py-32">
+        <section className="relative overflow-hidden flex items-center min-h-[calc(100vh-4rem)] py-12">
           <div className="container relative z-10">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div className="space-y-6">
@@ -172,7 +169,6 @@ export default function HomePage(): JSX.Element {
           </div>
         </section>
       </main>
-      <Footer />
     </>
   );
 }

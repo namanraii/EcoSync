@@ -4,8 +4,6 @@
  */
 
 import OnboardingWizard from '@/components/forms/onboarding-wizard';
-import { Navbar } from '@/components/layout/navbar';
-import { Footer } from '@/components/layout/footer';
 
 export const metadata = {
   title: 'Onboarding | EcoSync',
@@ -15,7 +13,6 @@ export const metadata = {
 export default function OnboardingPage(): JSX.Element {
   return (
     <>
-      <Navbar />
       <main className="flex-1 py-12">
         <div className="container">
           <div className="text-center mb-8">
@@ -27,7 +24,6 @@ export default function OnboardingPage(): JSX.Element {
           <OnboardingWizard />
         </div>
       </main>
-      <Footer />
     </>
   );
 }

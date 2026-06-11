@@ -6,8 +6,6 @@
 'use client';
 
 import * as React from 'react';
-import { Navbar } from '@/components/layout/navbar';
-import { Footer } from '@/components/layout/footer';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -46,8 +44,7 @@ export default function ActionsPage(): JSX.Element {
 
   return (
     <>
-      <Navbar />
-      <main className="flex-1 py-8">
+      <main className="flex-1 py-12">
         <div className="container">
           {/* Header */}
           <div className="mb-8">
@@ -241,7 +238,6 @@ export default function ActionsPage(): JSX.Element {
           </div>
         </div>
       </main>
-      <Footer />
     </>
   );
 }
