@@ -4,6 +4,7 @@
  */
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CarbonScoreGauge } from '@/components/charts/carbon-score-gauge';
@@ -14,6 +15,17 @@ export default function HomePage(): JSX.Element {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="relative overflow-hidden flex items-center min-h-[calc(100vh-4rem)] py-12">
+          {/* Fading Watercolor Background */}
+          <div className="absolute inset-0 z-0 opacity-40 pointer-events-none flex items-center justify-center mix-blend-multiply">
+            <Image
+              src="/hero-bg.png"
+              alt="Subtle watercolor forest background"
+              fill
+              className="object-cover object-center [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_70%)]"
+              priority
+            />
+          </div>
+          
           <div className="container relative z-10">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div className="space-y-6">
