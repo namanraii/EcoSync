@@ -8,6 +8,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   Sector,
+  type PieSectorDataItem,
 } from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import type { BreakdownItem } from '@/types'
@@ -24,8 +25,7 @@ const renderActiveShape = (props: unknown): JSX.Element => {
   const {
     cx, cy, innerRadius, outerRadius, startAngle, endAngle,
     fill, payload, percent
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } = props as Record<string, any>
+  } = props as PieSectorDataItem
 
   return (
     <g>

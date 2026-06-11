@@ -142,14 +142,20 @@ export default function OnboardingWizard(): JSX.Element {
       return
     }
 
-    setOnboardingData(validation.data!)
+    if (!validation.data) {
+      setErrors(['Validation data is missing'])
+      setIsSubmitting(false)
+      return
+    }
+
+    setOnboardingData(validation.data)
 
     if (!userProfile) {
       setUserProfile({
         id: crypto.randomUUID(),
         name: 'Eco User',
         region: 'global',
-        householdSize: validation.data!.energy.occupants,
+        householdSize: validation.data.energy.occupants,
         onboardingComplete: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
