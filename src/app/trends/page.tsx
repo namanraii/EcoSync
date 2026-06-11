@@ -20,24 +20,21 @@ export default function TrendsPage(): JSX.Element {
 
   if (!carbonProfile) {
     return (
-      <>
-        <main className="flex-1 flex flex-col items-center justify-center py-20 text-center">
-          <Card className="max-w-md mx-auto">
-            <CardHeader>
-              <CardTitle>No Profile Found</CardTitle>
-              <CardDescription>Complete the onboarding to see your trends.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <a href="/onboarding">
-                <button className="w-full bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90">
-                  Start Onboarding
-                </button>
-              </a>
-            </CardContent>
-          </Card>
-        </main>
-        <Footer />
-      </>
+      <main className="flex-1 flex flex-col items-center justify-center py-20 text-center">
+        <Card className="max-w-md mx-auto">
+          <CardHeader>
+            <CardTitle>No Profile Found</CardTitle>
+            <CardDescription>Complete the onboarding to see your trends.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <a href="/onboarding">
+              <button className="w-full bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90">
+                Start Onboarding
+              </button>
+            </a>
+          </CardContent>
+        </Card>
+      </main>
     );
   }
 
