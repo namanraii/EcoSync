@@ -23,7 +23,7 @@ export function FocusTrap({
   const previousFocusRef = React.useRef<HTMLElement | null>(null)
 
   // Store previous focus when activating
-  React.useEffect(() => {
+  React.useEffect((): void => {
     if (isActive) {
       previousFocusRef.current = document.activeElement as HTMLElement
 
@@ -45,10 +45,10 @@ export function FocusTrap({
   }, [isActive, initialFocusRef, returnFocusRef])
 
   // Handle Tab key to trap focus
-  React.useEffect(() => {
+  React.useEffect((): (() => void) | void => {
     if (!isActive) {return}
 
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handleKeyDown = (e: KeyboardEvent): void => {
       if (e.key === 'Tab') {
         const focusable = getFocusableElements(containerRef.current)
         if (focusable.length === 0) {return}
@@ -76,15 +76,15 @@ export function FocusTrap({
     }
 
     document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
+    return (): void => document.removeEventListener('keydown', handleKeyDown)
   }, [isActive, onEscape])
 
   // Prevent body scroll when active
-  React.useEffect(() => {
+  React.useEffect((): (() => void) => {
     if (isActive) {
       document.body.style.overflow = 'hidden'
     }
-    return () => {
+    return (): void => {
       document.body.style.overflow = ''
     }
   }, [isActive])
@@ -99,7 +99,7 @@ export function FocusTrap({
       aria-modal="true"
       aria-label={ariaLabel}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-      onClick={(e) => {
+      onClick={(e: React.MouseEvent<HTMLDivElement>): void => {
         if (e.target === e.currentTarget && onEscape) {
           onEscape()
         }

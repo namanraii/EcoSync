@@ -3,6 +3,9 @@ import { persist } from 'zustand/middleware'
 import type { OnboardingData, UserProfile, CarbonProfile, Insight, TrendData, ToastData } from '@/types'
 import { buildCarbonProfile } from '@/lib/utils/calculator'
 
+const ONBOARDING_COMPLETE_STEP = 5
+const TOAST_DURATION_MS = 5000
+
 interface AppState {
   // User data
   userProfile: UserProfile | null
@@ -66,9 +69,9 @@ export const useStore = create<AppState>()(
     (set, get) => ({
       ...initialState,
 
-      setUserProfile: (profile) => set({ userProfile: profile }),
+      setUserProfile: (profile): void => set({ userProfile: profile }),
 
-      updateUserProfile: (updates) => {
+      updateUserProfile: (updates): void => {
         const current = get().userProfile
         if (!current) {return}
         set({
@@ -76,21 +79,21 @@ export const useStore = create<AppState>()(
         })
       },
 
-      setOnboardingData: (data) => set({ onboardingData: data }),
+      setOnboardingData: (data): void => set({ onboardingData: data }),
 
-      setOnboardingStep: (step) => set({ onboardingStep: step }),
+      setOnboardingStep: (step): void => set({ onboardingStep: step }),
 
-      completeOnboarding: () => {
+      completeOnboarding: (): void => {
         const { userProfile } = get()
         if (userProfile) {
           set({
             userProfile: { ...userProfile, onboardingComplete: true, updatedAt: new Date().toISOString() },
-            onboardingStep: 5,
+            onboardingStep: ONBOARDING_COMPLETE_STEP,
           })
         }
       },
 
-      calculateProfile: () => {
+      calculateProfile: (): void => {
         const { onboardingData, userProfile } = get()
         if (!onboardingData || !userProfile) {return}
 
@@ -116,7 +119,7 @@ export const useStore = create<AppState>()(
         })
       },
 
-      commitAction: (actionId) => {
+      commitAction: (actionId): void => {
         const { committedActions } = get()
         if (!committedActions.includes(actionId)) {
           set({
@@ -126,7 +129,7 @@ export const useStore = create<AppState>()(
         }
       },
 
-      uncommitAction: (actionId) => {
+      uncommitAction: (actionId): void => {
         const { committedActions, actionProgress } = get()
         const newProgress = { ...actionProgress }
         delete newProgress[actionId]
@@ -136,7 +139,7 @@ export const useStore = create<AppState>()(
         })
       },
 
-      updateActionProgress: (actionId, progress) => {
+      updateActionProgress: (actionId, progress): void => {
         set({
           actionProgress: {
             ...get().actionProgress,
@@ -145,32 +148,32 @@ export const useStore = create<AppState>()(
         })
       },
 
-      addInsight: (insight) => {
+      addInsight: (insight): void => {
         set({ insights: [...get().insights, insight] })
       },
 
-      dismissInsight: (insightId) => {
+      dismissInsight: (insightId): void => {
         set({ insights: get().insights.filter((i) => i.id !== insightId) })
       },
 
-      addTrend: (trend) => {
+      addTrend: (trend): void => {
         set({ trends: [...get().trends, trend] })
       },
 
-      setSidebarOpen: (open) => set({ sidebarOpen: open }),
+      setSidebarOpen: (open): void => set({ sidebarOpen: open }),
 
-      setActiveTab: (tab) => set({ activeTab: tab }),
+      setActiveTab: (tab): void => set({ activeTab: tab }),
 
-      showToast: (message, type) => {
+      showToast: (message, type): void => {
         if (toastTimeoutId) {clearTimeout(toastTimeoutId)}
         set({ toast: { message, type } })
-        toastTimeoutId = setTimeout(() => {
+        toastTimeoutId = setTimeout((): void => {
           set({ toast: null })
           toastTimeoutId = null
-        }, 5000)
+        }, TOAST_DURATION_MS)
       },
 
-      clearToast: () => {
+      clearToast: (): void => {
         if (toastTimeoutId) {
           clearTimeout(toastTimeoutId)
           toastTimeoutId = null
@@ -178,7 +181,7 @@ export const useStore = create<AppState>()(
         set({ toast: null })
       },
 
-      resetStore: () => {
+      resetStore: (): void => {
         if (toastTimeoutId) {
           clearTimeout(toastTimeoutId)
           toastTimeoutId = null
@@ -203,30 +206,30 @@ export const useStore = create<AppState>()(
 )
 
 // Selectors
-export function useCarbonProfile() {
+export function useCarbonProfile(): CarbonProfile | null {
   return useStore((state) => state.carbonProfile)
 }
 
-export function useCommittedActions() {
+export function useCommittedActions(): string[] {
   return useStore((state) => state.committedActions)
 }
 
-export function useActionProgress() {
+export function useActionProgress(): Record<string, number> {
   return useStore((state) => state.actionProgress)
 }
 
-export function useInsights() {
+export function useInsights(): Insight[] {
   return useStore((state) => state.insights)
 }
 
-export function useTrends() {
+export function useTrends(): TrendData[] {
   return useStore((state) => state.trends)
 }
 
-export function useUserProfile() {
+export function useUserProfile(): UserProfile | null {
   return useStore((state) => state.userProfile)
 }
 
-export function useToast() {
+export function useToast(): ToastData | null {
   return useStore((state) => state.toast)
 }

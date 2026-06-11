@@ -6,6 +6,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { isClient } from '@/lib/utils/helpers'
 
+// Size and timing constants
+const MAX_ITEM_SIZE_CHARS = 100_000
+const MAX_SERIALIZED_SIZE_CHARS = 500_000
+const WARN_COOLDOWN_MS = 5000
+
+
 // Rate limiting configuration
 const RATE_LIMIT = {
   maxOperations: 10,      // Max 10 operations per window
@@ -25,7 +31,7 @@ function checkRateLimit(state: RateLimitState): { allowed: boolean; warning: boo
   const recentOps = state.operations.filter((t) => t > windowStart)
 
   if (recentOps.length >= RATE_LIMIT.maxOperations) {
-    const shouldWarn = now - state.lastWarning > 5000
+    const shouldWarn = now - state.lastWarning > WARN_COOLDOWN_MS
     return { allowed: false, warning: shouldWarn }
   }
 
@@ -51,10 +57,12 @@ function sanitizeKey(key: string): string {
     .slice(0, RATE_LIMIT.keyMaxLength)
 }
 
+type UseLocalStorageReturn<T> = [T, (value: T | ((prev: T) => T)) => void, () => void, { error: string | null; rateLimited: boolean }]
+
 export function useLocalStorage<T>(
   key: string,
   initialValue: T
-): [T, (value: T | ((prev: T) => T)) => void, () => void, { error: string | null; rateLimited: boolean }] {
+): UseLocalStorageReturn<T> {
   const sanitizedKey = sanitizeKey(key)
   const rateLimitRef = useRef<RateLimitState>({ operations: [], lastWarning: 0 })
   const [error, setError] = useState<string | null>(null)
@@ -68,7 +76,7 @@ export function useLocalStorage<T>(
       if (!item) {return initialValue}
 
       // Validate size before parsing
-      if (item.length > 100000) {
+      if (item.length > MAX_ITEM_SIZE_CHARS) {
         console.warn(`LocalStorage item ${sanitizedKey} exceeds safe size limit`)
         return initialValue
       }
@@ -100,11 +108,11 @@ export function useLocalStorage<T>(
         setRateLimited(false)
         setError(null)
 
-        const valueToStore = value instanceof Function ? value(storedValue) : value
+        const valueToStore = typeof value === 'function' ? (value as (prev: T) => T)(storedValue) : value
 
         // Validate serialized size before storing
         const serialized = JSON.stringify(valueToStore)
-        if (serialized.length > 500000) {
+        if (serialized.length > MAX_SERIALIZED_SIZE_CHARS) {
           throw new Error(`Value exceeds maximum storage size of 500KB for key: ${sanitizedKey}`)
         }
 
@@ -150,14 +158,14 @@ export function useLocalStorage<T>(
   }, [sanitizedKey, initialValue])
 
   // Sync with other tabs/windows
-  useEffect(() => {
+  useEffect((): (() => void) | void => {
     if (!isClient()) {return}
 
-    const handleStorageChange = (event: StorageEvent) => {
+    const handleStorageChange = (event: StorageEvent): void => {
       if (event.key === sanitizedKey && event.newValue !== null) {
         try {
           // Validate before parsing
-          if (event.newValue.length > 100000) {
+          if (event.newValue.length > MAX_ITEM_SIZE_CHARS) {
             console.warn('Received oversized storage update')
             return
           }
@@ -173,7 +181,9 @@ export function useLocalStorage<T>(
     }
 
     window.addEventListener('storage', handleStorageChange)
-    return () => window.removeEventListener('storage', handleStorageChange)
+    return (): void => {
+      window.removeEventListener('storage', handleStorageChange)
+    }
   }, [sanitizedKey, initialValue])
 
   // Operations array is pruned lazily during checkRateLimit and setValue

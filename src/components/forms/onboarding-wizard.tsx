@@ -54,7 +54,7 @@ export default function OnboardingWizard(): JSX.Element {
   const [announcement, setAnnouncement] = React.useState('')
   const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  React.useEffect(() => {
+  React.useEffect((): (() => void) => {
     return () => {
       if (timerRef.current) {clearTimeout(timerRef.current)}
     }
@@ -548,10 +548,9 @@ export default function OnboardingWizard(): JSX.Element {
   return (
     <main
       id="main-content"
-      role="main"
       className="container mx-auto flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-8"
     >
-      <Card className="w-full max-w-2xl" role="form" aria-label="Carbon footprint assessment wizard">
+      <Card className="w-full max-w-2xl" aria-label="Carbon footprint assessment wizard">
         <CardHeader>
           <div className="mb-4 flex items-center justify-between">
             <div>

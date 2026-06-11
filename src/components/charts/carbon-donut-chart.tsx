@@ -8,7 +8,6 @@ import {
   Tooltip,
   ResponsiveContainer,
   Sector,
-  type PieSectorDataItem,
 } from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import type { BreakdownItem } from '@/types'
@@ -20,12 +19,24 @@ interface CarbonDonutChartProps {
   ariaDescription?: string
 }
 
+interface CustomActiveShapeProps {
+  cx: number
+  cy: number
+  innerRadius: number
+  outerRadius: number
+  startAngle: number
+  endAngle: number
+  fill: string
+  payload: { label: string }
+  percent: number
+}
+
 // Memoized active shape for performance
 const renderActiveShape = (props: unknown): JSX.Element => {
   const {
     cx, cy, innerRadius, outerRadius, startAngle, endAngle,
     fill, payload, percent
-  } = props as PieSectorDataItem
+  } = props as CustomActiveShapeProps
 
   return (
     <g>

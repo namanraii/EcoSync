@@ -6,6 +6,8 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils/helpers';
 
+const ANIMATION_DURATION_MS = 300;
+
 export interface ToastProps {
   message: string;
   type?: 'success' | 'error' | 'warning' | 'info';
@@ -16,26 +18,26 @@ export interface ToastProps {
 export function Toast({ message, type = 'info', onClose, duration = 5000 }: ToastProps): JSX.Element {
   const [isVisible, setIsVisible] = React.useState(false);
 
-  React.useEffect(() => {
+  React.useEffect((): (() => void) => {
     // Trigger enter animation
-    const enterTimer = setTimeout(() => setIsVisible(true), 10);
+    const enterTimer = setTimeout((): void => setIsVisible(true), 10);
 
     // Auto-dismiss
-    const dismissTimer = setTimeout(() => {
+    const dismissTimer = setTimeout((): void => {
       setIsVisible(false);
-      setTimeout(onClose, 300); // Wait for exit animation
+      setTimeout(onClose, ANIMATION_DURATION_MS); // Wait for exit animation
     }, duration);
 
-    return () => {
+    return (): void => {
       clearTimeout(enterTimer);
       clearTimeout(dismissTimer);
     };
   }, [duration, onClose]);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent): void => {
     if (e.key === 'Escape') {
       setIsVisible(false);
-      setTimeout(onClose, 300);
+      setTimeout(onClose, ANIMATION_DURATION_MS);
     }
   };
 
@@ -85,9 +87,9 @@ export function Toast({ message, type = 'info', onClose, duration = 5000 }: Toas
       {icons[type]}
       <p className="text-sm font-medium">{message}</p>
       <button
-        onClick={() => {
+        onClick={(): void => {
           setIsVisible(false);
-          setTimeout(onClose, 300);
+          setTimeout(onClose, ANIMATION_DURATION_MS);
         }}
         className="ml-2 rounded p-1 hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         aria-label="Close notification"

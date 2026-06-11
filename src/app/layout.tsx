@@ -12,6 +12,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://ecosync.vercel.app'),
   title: 'EcoSync | Carbon Footprint Intelligence Platform',
   description:
     'Track, understand, and reduce your carbon footprint with personalized insights and actionable recommendations.',

@@ -3,9 +3,10 @@
  * Entry point for the carbon footprint assessment
  */
 
+import type { Metadata } from 'next';
 import OnboardingWizard from '@/components/forms/onboarding-wizard';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Onboarding | EcoSync',
   description: 'Calculate your carbon footprint in 5 simple steps.',
 };

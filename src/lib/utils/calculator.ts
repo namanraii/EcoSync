@@ -19,6 +19,9 @@ import {
 import { CARBON_ACTIONS } from '@/lib/data/carbon-actions';
 
 const DAYS_IN_YEAR = 365;
+const WEEKS_IN_YEAR = 52;
+const PERCENTAGE = 100;
+const KG_PER_TONNE = 1000;
 
 // ==================== COLOR PALETTE FOR BREAKDOWN ====================
 const CATEGORY_COLORS: Record<EmissionCategory, string[]> = {
@@ -43,7 +46,7 @@ export function calculateTransportEmissions(data: OnboardingData['transport']): 
   }
 
   const weeklyDistance = data.weeklyDistanceKm;
-  const annualDistance = weeklyDistance * 52;
+  const annualDistance = weeklyDistance * WEEKS_IN_YEAR;
   const primaryEmissions = annualDistance * factor.factor;
 
   // Public transit calculation
@@ -52,7 +55,7 @@ export function calculateTransportEmissions(data: OnboardingData['transport']): 
   if (transitFactor) {
     const transitMultiplier: Record<string, number> = {
       daily: 260,
-      weekly: 52,
+      weekly: WEEKS_IN_YEAR,
       rarely: 12,
       never: 0,
     };
@@ -75,19 +78,19 @@ export function calculateTransportEmissions(data: OnboardingData['transport']): 
     {
       label: 'Primary Vehicle',
       value: primaryEmissions,
-      percentage: (primaryEmissions / totalAnnual) * 100,
+      percentage: (primaryEmissions / totalAnnual) * PERCENTAGE,
       color: CATEGORY_COLORS.transport[0] ?? '#10b981',
     },
     {
       label: 'Public Transit',
       value: transitEmissions,
-      percentage: (transitEmissions / totalAnnual) * 100,
+      percentage: (transitEmissions / totalAnnual) * PERCENTAGE,
       color: CATEGORY_COLORS.transport[1] ?? '#10b981',
     },
     {
       label: 'Air Travel',
       value: flightEmissions,
-      percentage: (flightEmissions / totalAnnual) * 100,
+      percentage: (flightEmissions / totalAnnual) * PERCENTAGE,
       color: CATEGORY_COLORS.transport[2] ?? '#10b981',
     },
   ].filter((item) => item.value > 0);
@@ -96,7 +99,7 @@ export function calculateTransportEmissions(data: OnboardingData['transport']): 
     category: 'transport',
     subcategory: data.primaryVehicle,
     annualKgCO2: totalAnnual,
-    dailyKgCO2: totalAnnual / 365,
+    dailyKgCO2: totalAnnual / DAYS_IN_YEAR,
     breakdown,
     confidence: 0.85,
   };
@@ -111,12 +114,12 @@ export function calculateDietEmissions(data: OnboardingData['diet']): CarbonResu
     throw new Error(`Unknown diet type: ${data.dietType}`);
   }
 
-  const baseEmissions = factor.factor * 365; // Annual
+  const baseEmissions = factor.factor * DAYS_IN_YEAR; // Annual
 
   // Local food bonus
   const localBonusFactor = getEmissionFactor('diet', 'local_food_bonus', 'global');
   const localBonus = localBonusFactor
-    ? baseEmissions * (localBonusFactor.factor * (data.localFoodPercentage / 100))
+    ? baseEmissions * (localBonusFactor.factor * (data.localFoodPercentage / PERCENTAGE))
     : 0;
 
   // Food waste penalty
@@ -128,7 +131,7 @@ export function calculateDietEmissions(data: OnboardingData['diet']): CarbonResu
     often: 1.0,
   };
   const wastePenalty = wastePenaltyFactor
-    ? wastePenaltyFactor.factor * 365 * (wasteMultiplier[data.foodWasteFrequency] ?? 0)
+    ? wastePenaltyFactor.factor * DAYS_IN_YEAR * (wasteMultiplier[data.foodWasteFrequency] ?? 0)
     : 0;
 
   const totalAnnual = baseEmissions + localBonus + wastePenalty;
@@ -137,19 +140,19 @@ export function calculateDietEmissions(data: OnboardingData['diet']): CarbonResu
     {
       label: 'Diet Base',
       value: baseEmissions,
-      percentage: (baseEmissions / totalAnnual) * 100,
+      percentage: (baseEmissions / totalAnnual) * PERCENTAGE,
       color: CATEGORY_COLORS.diet[0] ?? '#10b981',
     },
     {
       label: 'Local Food Bonus',
       value: Math.abs(localBonus),
-      percentage: (Math.abs(localBonus) / totalAnnual) * 100,
+      percentage: (Math.abs(localBonus) / totalAnnual) * PERCENTAGE,
       color: CATEGORY_COLORS.diet[1] ?? '#10b981',
     },
     {
       label: 'Food Waste',
       value: wastePenalty,
-      percentage: (wastePenalty / totalAnnual) * 100,
+      percentage: (wastePenalty / totalAnnual) * PERCENTAGE,
       color: CATEGORY_COLORS.diet[2] ?? '#10b981',
     },
   ].filter((item) => item.value > 0.1);
@@ -217,25 +220,25 @@ export function calculateEnergyEmissions(data: OnboardingData['energy']): Carbon
     {
       label: 'Electricity',
       value: electricityEmissions,
-      percentage: (electricityEmissions / totalAnnual) * 100,
+      percentage: (electricityEmissions / totalAnnual) * PERCENTAGE,
       color: CATEGORY_COLORS.energy[0] ?? '#10b981',
     },
     {
       label: 'Heating',
       value: heatingEmissions,
-      percentage: (heatingEmissions / totalAnnual) * 100,
+      percentage: (heatingEmissions / totalAnnual) * PERCENTAGE,
       color: CATEGORY_COLORS.energy[1] ?? '#10b981',
     },
     {
       label: 'Air Conditioning',
       value: acEmissions,
-      percentage: (acEmissions / totalAnnual) * 100,
+      percentage: (acEmissions / totalAnnual) * PERCENTAGE,
       color: CATEGORY_COLORS.energy[2] ?? '#10b981',
     },
     {
       label: 'Renewable Offset',
       value: Math.abs(renewableBonus),
-      percentage: (Math.abs(renewableBonus) / totalAnnual) * 100,
+      percentage: (Math.abs(renewableBonus) / totalAnnual) * PERCENTAGE,
       color: CATEGORY_COLORS.energy[3] ?? '#10b981',
     },
   ].filter((item) => item.value > 0.1);
@@ -264,11 +267,11 @@ export function calculateDigitalEmissions(data: OnboardingData['digital']): Carb
     throw new Error('Digital emission factors not found');
   }
 
-  const screenEmissions = data.dailyScreenHours * 365 * screenFactor.factor;
-  const streamingEmissions = data.streamingHours * 365 * streamingFactor.factor;
-  const emailEmissions = data.emailCount * 365 * emailFactor.factor;
+  const screenEmissions = data.dailyScreenHours * DAYS_IN_YEAR * screenFactor.factor;
+  const streamingEmissions = data.streamingHours * DAYS_IN_YEAR * streamingFactor.factor;
+  const emailEmissions = data.emailCount * DAYS_IN_YEAR * emailFactor.factor;
   const cloudEmissions = data.cloudStorageGB * cloudFactor.factor * 12; // Monthly
-  const standbyEmissions = data.deviceCount * standbyFactor.factor * 365;
+  const standbyEmissions = data.deviceCount * standbyFactor.factor * DAYS_IN_YEAR;
 
   const totalAnnual = screenEmissions + streamingEmissions + emailEmissions + cloudEmissions + standbyEmissions;
 
@@ -276,31 +279,31 @@ export function calculateDigitalEmissions(data: OnboardingData['digital']): Carb
     {
       label: 'Screen Time',
       value: screenEmissions,
-      percentage: (screenEmissions / totalAnnual) * 100,
+      percentage: (screenEmissions / totalAnnual) * PERCENTAGE,
       color: CATEGORY_COLORS.digital[0] ?? '#10b981',
     },
     {
       label: 'Streaming',
       value: streamingEmissions,
-      percentage: (streamingEmissions / totalAnnual) * 100,
+      percentage: (streamingEmissions / totalAnnual) * PERCENTAGE,
       color: CATEGORY_COLORS.digital[1] ?? '#10b981',
     },
     {
       label: 'Email',
       value: emailEmissions,
-      percentage: (emailEmissions / totalAnnual) * 100,
+      percentage: (emailEmissions / totalAnnual) * PERCENTAGE,
       color: CATEGORY_COLORS.digital[2] ?? '#10b981',
     },
     {
       label: 'Cloud Storage',
       value: cloudEmissions,
-      percentage: (cloudEmissions / totalAnnual) * 100,
+      percentage: (cloudEmissions / totalAnnual) * PERCENTAGE,
       color: CATEGORY_COLORS.digital[3] ?? '#10b981',
     },
     {
       label: 'Device Standby',
       value: standbyEmissions,
-      percentage: (standbyEmissions / totalAnnual) * 100,
+      percentage: (standbyEmissions / totalAnnual) * PERCENTAGE,
       color: CATEGORY_COLORS.digital[4] ?? '#10b981',
     },
   ].filter((item) => item.value > 0.1);
@@ -355,25 +358,25 @@ export function calculateConsumptionEmissions(data: OnboardingData['consumption'
     {
       label: 'Clothing',
       value: clothingEmissions,
-      percentage: (clothingEmissions / totalAnnual) * 100,
+      percentage: (clothingEmissions / totalAnnual) * PERCENTAGE,
       color: CATEGORY_COLORS.consumption[0] ?? '#10b981',
     },
     {
       label: 'Electronics',
       value: electronicsEmissions,
-      percentage: (electronicsEmissions / totalAnnual) * 100,
+      percentage: (electronicsEmissions / totalAnnual) * PERCENTAGE,
       color: CATEGORY_COLORS.consumption[1] ?? '#10b981',
     },
     {
       label: 'Services',
       value: servicesEmissions,
-      percentage: (servicesEmissions / totalAnnual) * 100,
+      percentage: (servicesEmissions / totalAnnual) * PERCENTAGE,
       color: CATEGORY_COLORS.consumption[2] ?? '#10b981',
     },
     {
       label: 'Recycling Offset',
       value: Math.abs(recyclingBonus),
-      percentage: (Math.abs(recyclingBonus) / totalAnnual) * 100,
+      percentage: (Math.abs(recyclingBonus) / totalAnnual) * PERCENTAGE,
       color: CATEGORY_COLORS.consumption[3] ?? '#10b981',
     },
   ].filter((item) => item.value > 0.1);
@@ -415,7 +418,7 @@ export function buildCarbonProfile(
 
   // Calculate percentile vs regional average
   const regionalAverage = REGIONAL_AVERAGES[region] ?? REGIONAL_AVERAGES['global'] ?? 12000;
-  const percentile = Math.round((1 - totalAnnual / regionalAverage) * 100);
+  const percentile = Math.round((1 - totalAnnual / regionalAverage) * PERCENTAGE);
 
   return {
     totalAnnualKgCO2: Math.round(totalAnnual * 100) / 100,
@@ -445,7 +448,7 @@ export function calculateCarbonScore(annualKgCO2: number): number {
   if (annualKgCO2 >= poor) {return 0;}
 
   // Linear interpolation between excellent and poor
-  const score = 100 - ((annualKgCO2 - excellent) / (poor - excellent)) * 100;
+  const score = PERCENTAGE - ((annualKgCO2 - excellent) / (poor - excellent)) * PERCENTAGE;
   return Math.round(score * 10) / 10;
 }
 
@@ -496,8 +499,8 @@ export function getCarbonRating(score: number): {
  * Format carbon value for display
  */
 export function formatCarbonValue(kgCO2: number): string {
-  if (kgCO2 >= 1000) {
-    return `${(kgCO2 / 1000).toFixed(1)}t`;
+  if (kgCO2 >= KG_PER_TONNE) {
+    return `${(kgCO2 / KG_PER_TONNE).toFixed(1)}t`;
   }
   return `${Math.round(kgCO2)}kg`;
 }

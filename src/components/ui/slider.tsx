@@ -32,12 +32,12 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
       value,
       onChange,
       showValue = true,
-      valueFormatter = (v) => String(v),
+      valueFormatter = (v: number): string => String(v),
       id,
       ...props
     },
     ref
-  ) => {
+  ): React.ReactElement => {
     const defaultId = React.useId();
     const sliderId = id || defaultId;
     const errorId = `${sliderId}-error`;

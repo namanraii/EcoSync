@@ -11,7 +11,7 @@ export function SkipLink({
   targetId = 'main-content',
   label = 'Skip to main content',
 }: SkipLinkProps): JSX.Element {
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>): void => {
     e.preventDefault()
     const target = document.getElementById(targetId)
     if (target) {
@@ -19,7 +19,7 @@ export function SkipLink({
       target.focus()
       target.scrollIntoView({ behavior: 'smooth' })
       // Remove tabIndex after blur to keep DOM clean
-      const handleBlur = () => {
+      const handleBlur = (): void => {
         target.removeAttribute('tabindex')
         target.removeEventListener('blur', handleBlur)
       }
